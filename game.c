@@ -1,10 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS 
 
-#include "game.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "game.h"
 #include "audio.h"
 
 #include <allegro5/allegro.h>
