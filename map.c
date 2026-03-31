@@ -1,5 +1,3 @@
-// 수정시간 2026-03-31 00:02 재혁
-
 #include "map.h"
 #include "game.h"
 
@@ -47,10 +45,10 @@ void Init_stage3_map(GameState* g) {
 	g->stage_map.objects[2] = (map){ 460, 459, 308 ,54 };
 	g->stage_map.objects[3] = (map){ 585, 413, 95, 44 };
 	g->stage_map.objects[4] = (map){ 718, 363, 264, 69 };
-	g->stage_map.objects[5] = (map){ 795, 318, 85, 45 };
+	g->stage_map.objects[5] = (map){ 795, 318, 85, 60 };
 	g->stage_map.objects[6] = (map){ 914, 285, 286, 74 };
-	g->stage_map.objects[7] = (map){ 983, 229, 35, 53 };
-	g->stage_map.objects[8] = (map){ 1018, 183, 101, 100 };
+	g->stage_map.objects[7] = (map){ 983, 229, 35, 70 };
+	g->stage_map.objects[8] = (map){ 1018, 183, 101, 110 };
 
 }
 void Init_stageBOSS_map(GameState* g) {
