@@ -1,5 +1,3 @@
-// 수정시간 2026-03-31 00:03 재혁
-
 #include "Display.h"
 #include "map.h"
 #include "game.h"
