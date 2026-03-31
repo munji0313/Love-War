@@ -1,4 +1,3 @@
-// ¼öÁ¤½Ã°£ 2026-03-31 00:01 ÀçÇõ
 #ifndef BULLET_H
 #define BULLET_H
 #include <stdbool.h>
@@ -12,7 +11,7 @@
 typedef struct {
     float x, y;
     float dx, dy;
-    bool player;    // ÃÑ¾ËÀÇ ¹ß¿øÁö (player / enemy)
+    bool player;    // ì´ì•Œì˜ ë°œì›ì§€ (player / enemy)
     bool used;
 } Bullet;
 
