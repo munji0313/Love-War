@@ -1,0 +1,2978 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love &amp; War — API 문서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #fdf0f5;
+  --surface:   #fff8fb;
+  --surface2:  #fce8f0;
+  --border:    #f0b8d0;
+  --accent:    #e84d8a;
+  --accent2:   #5b8dee;
+  --accent3:   #c8962a;
+  --text:      #3d1a2e;
+  --muted:     #b07090;
+  --code-bg:   #1a0a12;
+  --card-glow: rgba(232,77,138,0.15);
+  --gold:      #d4a017;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── petal particle bg ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,182,193,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 0%, rgba(173,216,255,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(255,218,235,0.4) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── header ── */
+header {
+  position: relative;
+  padding: 0;
+  text-align: center;
+  border-bottom: 3px solid var(--border);
+  overflow: hidden;
+  background: var(--surface);
+}
+.header-hero {
+  position: relative;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.header-bg-img {
+  position: absolute; inset: 0;
+  background-image: url("https://i.imgur.com/7ybFisE.jpeg");
+  background-size: cover;
+  background-position: center top;
+  filter: brightness(0.85);
+}
+.header-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(253,240,245,0.7) 90%, var(--bg) 100%);
+}
+.hero-chars {
+  position: absolute;
+  bottom: 0; 
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 60px;
+  pointer-events: none;
+}
+.hero-char {
+  height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  animation: charFloat 3s ease-in-out infinite;
+}
+.hero-char.boss {
+  animation-delay: -1.5s;
+  transform: scaleX(-1);
+}
+@keyframes charFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero-char.boss {
+  animation-delay: -1.5s;
+}
+@keyframes charFloatBoss {
+  0%, 100% { transform: scaleX(-1) translateY(0); }
+  50% { transform: scaleX(-1) translateY(-8px); }
+}
+.hero-char.boss { animation: charFloatBoss 3s ease-in-out infinite; animation-delay: -1.5s; }
+
+.game-title {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: clamp(40px, 6vw, 72px);
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 2;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.2), 0 0 30px rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: transform .2s, filter .2s;
+  user-select: none;
+}
+.game-title:hover {
+  transform: scale(1.04);
+  filter: drop-shadow(0 0 12px rgba(232,77,138,0.5));
+}
+.game-title .love {
+  background: linear-gradient(135deg, #ff6eb4 0%, #e8194d 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.game-title .amp {
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
+  font-size: 0.7em;
+}
+.game-title .war {
+  background: linear-gradient(135deg, #6ab8ff 0%, #1a5fcc 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.title-heart {
+  font-size: 0.6em;
+  display: block;
+  margin-bottom: -4px;
+  animation: heartBeat 1.4s ease-in-out infinite;
+}
+@keyframes heartBeat {
+  0%,100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+.game-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent2);
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  position: relative; z-index: 2;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.9);
+}
+.version-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 14px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.8);
+  position: relative; z-index: 2;
+  box-shadow: 0 2px 8px rgba(232,77,138,0.25);
+}
+
+/* ── search ── */
+.search-wrap {
+  max-width: 680px;
+  margin: 32px auto 0;
+  padding: 0 0 8px;
+  position: relative;
+  z-index: 10;
+}
+.search-box {
+  position: relative;
+}
+.search-box input {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  color: var(--text);
+  font-family: 'Nunito', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  box-shadow: 0 3px 12px rgba(232,77,138,0.1);
+}
+.search-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(232,77,138,0.15);
+}
+.search-box input::placeholder { color: var(--muted); font-weight: 400; }
+.search-icon {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  color: var(--accent); font-size: 16px; pointer-events: none;
+}
+
+/* autocomplete */
+.autocomplete {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 8px 24px rgba(232,77,138,0.15);
+}
+.autocomplete.open { display: block; }
+.ac-item {
+  padding: 10px 18px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  transition: background .15s;
+}
+.ac-item:hover, .ac-item.selected { background: var(--surface2); }
+.ac-item .ac-group {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-left: auto;
+  white-space: nowrap;
+  background: var(--surface2);
+}
+.ac-item .ac-match { color: var(--accent); font-weight: 700; }
+
+/* ── main layout ── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative; z-index: 1;
+}
+
+/* ── section label ── */
+.section-label {
+  display: flex; align-items: center; gap: 14px;
+  margin: 48px 0 24px;
+}
+.section-label::before {
+  content: '🌸';
+  font-size: 18px;
+}
+.section-label h2 {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── cards grid ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+.card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  cursor: pointer;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(232,77,138,0.08);
+}
+.card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity .2s;
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--card-glow);
+}
+.card:hover::after { opacity: 1; }
+.card-icon {
+  font-size: 28px; margin-bottom: 12px; display: block;
+}
+.card-name {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 17px;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.card-count {
+  position: absolute; top: 16px; right: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent2);
+  background: rgba(91,141,238,0.1);
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid rgba(91,141,238,0.3);
+  font-weight: 600;
+}
+
+/* ── modal overlay ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(61,26,46,0.75);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 860px;
+  position: relative;
+  animation: slideUp .25s ease;
+  box-shadow: 0 20px 60px rgba(232,77,138,0.2);
+}
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(20px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+  border-radius: 18px 18px 0 0;
+}
+.modal-header-icon { font-size: 28px; }
+.modal-header-info { flex: 1; }
+.modal-header h2 {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.modal-header p {
+  font-size: 13px; color: var(--muted); margin-top: 2px;
+}
+.modal-close {
+  background: none; border: none; color: var(--muted);
+  font-size: 20px; cursor: pointer; padding: 6px 10px;
+  transition: color .2s, background .2s;
+  line-height: 1; border-radius: 50%;
+}
+.modal-close:hover { color: var(--accent); background: var(--surface2); }
+.modal-body { padding: 24px 28px; }
+
+/* ── function list (accordion) ── */
+.fn-list { display: flex; flex-direction: column; gap: 10px; }
+.fn-item {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.fn-trigger {
+  width: 100%; background: var(--surface2);
+  border: none; cursor: pointer;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  text-align: left;
+  transition: background .15s;
+}
+.fn-trigger:hover { background: var(--border); }
+.fn-trigger.active { background: rgba(232,77,138,0.08); border-bottom: 2px solid var(--border); }
+.fn-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--accent);
+  font-weight: 600;
+}
+.fn-brief {
+  font-size: 12px; color: var(--muted); margin-left: auto; padding-left: 10px;
+}
+.fn-chevron {
+  color: var(--muted); font-size: 12px; margin-left: 6px;
+  transition: transform .2s;
+}
+.fn-trigger.active .fn-chevron { transform: rotate(90deg); }
+.fn-detail {
+  display: none;
+  padding: 18px 16px;
+  background: var(--code-bg);
+}
+.fn-detail.open { display: block; }
+
+/* detail sections */
+.detail-section { margin-bottom: 16px; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-label {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent3);
+  margin-bottom: 7px;
+}
+.detail-text { font-size: 13px; color: #e8d0da; line-height: 1.7; }
+
+/* param table */
+.param-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.param-table th {
+  text-align: left; padding: 6px 12px;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  border-bottom: 1px solid #3a1a2a;
+  font-weight: 400;
+  color: #c090a0;
+}
+.param-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(60,20,40,0.5);
+  vertical-align: top;
+}
+.param-table tr:last-child td { border-bottom: none; }
+.param-type {
+  font-family: 'JetBrains Mono', monospace;
+  color: #f0c060;
+  font-size: 12px;
+}
+.param-name {
+  font-family: 'JetBrains Mono', monospace;
+  color: #80d0ff;
+  font-size: 12px;
+}
+
+/* return badge */
+.return-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #f0c060;
+  background: rgba(240,192,96,0.1);
+  border: 1px solid rgba(240,192,96,0.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* code block */
+.code-block {
+  background: #100510;
+  border: 1px solid #3a1530;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #e8d0da;
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-kw  { color: #ff8fa0; }
+.code-fn  { color: #d090ff; }
+.code-str { color: #90d8ff; }
+.code-num { color: #ffdb70; }
+.code-cm  { color: #805060; font-style: italic; }
+.code-type { color: #80d0ff; }
+
+/* ── search result panel ── */
+#search-result {
+  margin-top: 40px;
+  display: none;
+}
+#search-result.visible { display: block; }
+.sr-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px var(--card-glow);
+}
+.sr-header {
+  padding: 20px 26px;
+  background: var(--surface2);
+  border-bottom: 2px solid var(--border);
+}
+.sr-fn-sig {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.sr-group {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--border);
+  padding: 2px 9px;
+  border-radius: 10px;
+  margin-top: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.sr-body { padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; }
+
+/* ── scene previews section ── */
+.scene-section {
+  margin-top: 48px;
+}
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.scene-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 16px rgba(232,77,138,0.1);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+  background: var(--surface);
+}
+.scene-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(232,77,138,0.2);
+}
+.scene-card img {
+  width: 100%;
+  display: block;
+  border-bottom: 2px solid var(--border);
+}
+.scene-card-label {
+  padding: 10px 14px;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── characters section ── */
+.chars-section {
+  margin-top: 48px;
+  margin-bottom: 16px;
+}
+.chars-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.char-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(232,77,138,0.08);
+  transition: transform .2s, box-shadow .2s;
+}
+.char-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(232,77,138,0.18);
+}
+.char-card img {
+  height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(232,77,138,0.3));
+}
+.char-name {
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+.char-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ── footer ── */
+footer {
+  text-align: center;
+  padding: 40px;
+  margin-top: 60px;
+  border-top: 2px solid var(--border);
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  position: relative; z-index: 1;
+}
+footer .heart { color: var(--accent); animation: heartBeat 1.4s ease-in-out infinite; display: inline-block; }
+footer .war { color: var(--accent2); }
+
+/* ── back button ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 9px 20px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  color: var(--accent);
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 2px 10px rgba(232,77,138,0.1);
+}
+.back-btn:hover {
+  background: var(--surface2);
+  border-color: var(--accent);
+  transform: translateX(-3px);
+  box-shadow: 0 4px 16px rgba(232,77,138,0.2);
+}
+
+/* utils */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header>
+  <div class="header-hero">
+    <div class="header-bg-img"></div>
+    <div class="header-overlay"></div>
+    <div class="hero-chars">
+      <img class="hero-char" src="https://i.imgur.com/TYMvxmq.png" alt="Player">
+      <img class="hero-char boss" src="https://i.imgur.com/elkYuoh.png" alt="Boss">
+    </div>
+    <div class="game-title" id="gameTitle" title="클릭하면 메인으로 이동">
+      <span class="title-heart">💗</span>
+      <span class="love">LOVE</span>
+      <span class="amp"> &amp; </span>
+      <span class="war">WAR</span>
+    </div>
+    <div class="game-subtitle">Allegro5 Side-Scroller · C API Reference</div>
+    <div class="version-badge">v1.0.0 — 2026</div>
+  </div>
+
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="container">
+
+  <!-- SEARCH -->
+  <div class="search-wrap" style="padding: 32px 0 0; max-width: 100%; margin: 0;">
+    <div class="search-box" id="searchBox">
+      <input type="text" id="searchInput" placeholder="함수명 검색... (예: Init_player, Update_boss)" autocomplete="off">
+      <span class="search-icon">🔍</span>
+      <div class="autocomplete" id="autocomplete"></div>
+    </div>
+  </div>
+
+  <!-- search result panel -->
+  <div id="search-result"></div>
+
+  <!-- cards section -->
+  <div id="cards-section">
+    <div class="section-label"><h2>API 모듈 목록</h2></div>
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <!-- Characters -->
+    <div class="chars-section">
+      <div class="section-label"><h2>등장인물</h2></div>
+      <div class="chars-row">
+        <div class="char-card">
+          <img src="https://i.imgur.com/TYMvxmq.png" alt="Player">
+          <div class="char-name">플레이어</div>
+          <div class="char-tag">player.c · Player struct</div>
+        </div>
+        <div class="char-card">
+          <img src="https://i.imgur.com/elkYuoh.png" alt="Boss">
+          <div class="char-name">남편(boss)</div>
+          <div class="char-tag">boss.c · Boss struct</div>
+        </div>
+        <div class="char-card">
+          <img src="https://i.imgur.com/Ky13R2T.png" alt="경찰관">
+          <div class="char-name">경찰관</div>
+          <div class="char-tag">enemy.c · easy_enemy</div>
+        </div>
+        <div class="char-card">
+          <img src="https://i.imgur.com/lhGIsE7.png" alt="변호사">
+          <div class="char-name">변호사</div>
+          <div class="char-tag">enemy.c · hard_enemy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Play Map Previews -->
+    <div class="scene-section">
+      <div class="section-label"><h2>플레이 맵</h2></div>
+      <div class="scene-grid">
+        <div class="scene-card">
+          <img src="https://i.imgur.com/3fnT3FU.png" alt="Stage 1 Map" width="90">
+          <div class="scene-card-label">🗺️ Stage 1 맵</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/JNyST7Q.png" alt="Stage 2 Map" width="90">
+          <div class="scene-card-label">🗺️ Stage 2 맵</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/5jVrljB.png" alt="Stage 3 Map" width="90">
+          <div class="scene-card-label">🗺️ Stage 3 맵</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/UCWOEVu.png" alt="Boss Stage Map" width="90">
+          <div class="scene-card-label">💀 Boss 스테이지 맵</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene Previews -->
+    <div class="scene-section">
+      <div class="section-label"><h2>인게임 화면 미리보기</h2></div>
+      <div class="scene-grid">
+        <div class="scene-card">
+          <img src="https://i.imgur.com/ByxytfY.png" alt="Start Screen">
+          <div class="scene-card-label">🏠 타이틀 화면</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/Q93Ik3z.png" alt="Stage Change">
+          <div class="scene-card-label">🌸 스테이지 전환</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/EpCTlRU.png" alt="Game Clear">
+          <div class="scene-card-label">🏆 게임 클리어</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/nVr0vNh.png" alt="Game Over">
+          <div class="scene-card-label">💔 게임 오버</div>
+        </div>
+        <div class="scene-card">
+          <img src="https://i.imgur.com/4mEIPRH.png" alt="Game Rank">
+          <div class="scene-card-label">🏅 랭킹 화면</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <span class="modal-header-icon" id="modalIcon"></span>
+      <div class="modal-header-info">
+        <h2 id="modalTitle"></h2>
+        <p id="modalDesc"></p>
+      </div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fn-list" id="fnList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>Love &amp; War © 2026 &nbsp;·&nbsp; Built with <span class="heart">♥</span> &amp; <span class="war">Allegro5</span> &nbsp;·&nbsp; C API Docs</footer>
+
+<!-- ══════════ DATA + LOGIC ══════════ -->
+<script>
+const API = {
+  groups: [
+    {
+      id: 'game',
+      icon: '⚙️',
+      name: 'Game',
+      desc: '게임 전체 초기화, 스테이지 전환, 랭킹 저장·불러오기 등 핵심 게임 상태를 관리합니다. (game.c)',
+      fns: [
+        {
+          name: 'Init_game',
+          sig: 'int Init_game(void)',
+          brief: 'Allegro 시스템 전체 초기화',
+          desc: 'Allegro 코어 시스템, 마우스·키보드 입력, 폰트(TTF 포함), 기본 도형 그리기 기능, 이미지 애드온을 순서대로 초기화합니다. 어느 단계에서든 실패하면 오류 메시지를 출력하고 <code>-1</code>을 반환합니다.',
+          params: [],
+          ret: 'int — 0: 성공, -1: 초기화 실패',
+          example: `<span class="code-kw">if</span> (<span class="code-fn">Init_game</span>() != <span class="code-num">0</span>) {
+    <span class="code-fn">fprintf</span>(stderr, <span class="code-str">"게임 초기화 실패\n"</span>);
+    <span class="code-kw">return</span> <span class="code-num">-1</span>;
+}`,
+          fullcode: `<span class="code-kw">int</span> <span class="code-fn">Init_game</span>() {
+    <span class="code-cm">/* Allegro 시스템 초기화 */</span>
+    <span class="code-kw">if</span> (!<span class="code-fn">al_init</span>()) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;Allegro init failed\n&quot;</span>);
+        <span class="code-kw">return</span> -<span class="code-num">1</span>;
+    }
+    <span class="code-cm">/* 마우스 입력 시스템 설치 */</span>
+    <span class="code-kw">if</span> (!<span class="code-fn">al_install_mouse</span>()) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;Mouse install failed\n&quot;</span>);
+        <span class="code-kw">return</span> -<span class="code-num">1</span>;
+    }
+    <span class="code-cm">/* 키보드 입력 시스템 설치 */</span>
+    <span class="code-kw">if</span> (!<span class="code-fn">al_install_keyboard</span>()) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;Keyboard install failed\n&quot;</span>);
+        <span class="code-kw">return</span> -<span class="code-num">1</span>;
+    }
+    <span class="code-cm">/* 폰트 및 기본 도형 그리기 기능 초기화 */</span>
+    <span class="code-fn">al_init_font_addon</span>();
+    <span class="code-fn">al_init_primitives_addon</span>();
+    <span class="code-fn">al_init_ttf_addon</span>();
+    <span class="code-fn">al_init_image_addon</span>();
+
+    <span class="code-kw">return</span> <span class="code-num">0</span>;
+}`
+        },
+        {
+          name: 'Update_game',
+          sig: 'void Update_game(GameState* g)',
+          brief: '스테이지 클리어 시 다음 스테이지로 전환',
+          desc: '현재 레벨(<code>g->level</code>)을 기준으로 다음 스테이지 맵을 초기화하고 레벨을 증가시킵니다. STAGE1→STAGE2→STAGE3→BOSS 순으로 전환되며, BOSS 클리어 시 <code>OVER</code>로 설정합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 구조체 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-kw">if</span> (game.stage_over == <span class="code-kw">true</span>) {
+    <span class="code-fn">Update_game</span>(&game);
+    scene = SCENE_CHANGE;
+}`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_game</span>(<span class="code-type">GameState</span>* g) {
+
+    <span class="code-fn">Init_boss</span>(g);
+
+    <span class="code-kw">if</span> (g-&gt;level == STAGE1) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;2로 넘어가\n&quot;</span>);
+        g-&gt;level = STAGE2;
+        <span class="code-fn">Init_stage2_map</span>(g);
+    }
+    <span class="code-kw">else</span> <span class="code-kw">if</span> (g-&gt;level == STAGE2) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;3으로 넘어가\n&quot;</span>);
+        g-&gt;level = STAGE3;
+        <span class="code-fn">Init_stage3_map</span>(g);
+    }
+    <span class="code-kw">else</span> <span class="code-kw">if</span> (g-&gt;level == STAGE3) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;4로 넘어가\n&quot;</span>);
+        g-&gt;level = BOSS;
+        g-&gt;boss.isAlive = <span class="code-kw">true</span>;
+        <span class="code-fn">Init_stageBOSS_map</span>(g);
+    }
+    <span class="code-kw">else</span> <span class="code-kw">if</span> (g-&gt;level == BOSS) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;게임끝\n&quot;</span>);
+        g-&gt;level = OVER;
+    }
+    <span class="code-fn">Init_player</span>(g);
+
+    <span class="code-fn">Init_enemymanage</span>(g);
+    <span class="code-fn">Init_bullets</span>(g);
+
+    g-&gt;stage_over = <span class="code-kw">false</span>;
+}`
+        },
+        {
+          name: 'Reset_game',
+          sig: 'void Reset_game(GameState* g)',
+          brief: '게임 전체 상태 초기화 (새 게임 시작)',
+          desc: '점수·시간·프레임·레벨·<code>stage_over</code> 플래그·<code>score_count</code>를 초기값으로 리셋하고, 플레이어 생명력을 <code>MAX_LIFE</code>로 설정합니다. 플레이어·적·총알·보스·스테이지1 맵을 새로 초기화합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '초기화할 게임 상태 구조체 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Reset_game</span>(&game);
+<span class="code-fn">strcpy</span>(game.my_score.nickname, nickname);
+scene = SCENE_GAME;`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Reset_game</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-cm">/* 게임 진행값 초기화 */</span>
+    g-&gt;score = <span class="code-num">0</span>;
+    g-&gt;game_over = <span class="code-kw">false</span>;
+    g-&gt;time = <span class="code-num">0</span>;
+    g-&gt;frame = <span class="code-num">0</span>;
+    g-&gt;level = STAGE1;
+    g-&gt;stage_over = <span class="code-kw">false</span>;
+    g-&gt;player.life = MAX_LIFE;
+    g-&gt;score_count = <span class="code-num">0</span>;
+    <span class="code-fn">Init_player</span>(g);
+    <span class="code-fn">Init_enemymanage</span>(g);
+    <span class="code-fn">Init_bullets</span>(g);
+    <span class="code-fn">Init_boss</span>(g);
+    <span class="code-fn">Init_stage1_map</span>(g);
+}`
+        },
+        {
+          name: 'Load_ranking',
+          sig: 'void Load_ranking(scores* l)',
+          brief: 'ranking.txt에서 랭킹 데이터 읽기',
+          desc: '<code>ranking.txt</code> 파일을 표준 입력으로 리다이렉트하여 닉네임 10개, 점수 10개, 시간 10개를 순서대로 읽어 <code>l</code> 배열에 저장합니다.',
+          params: [
+            { name: 'l', type: 'scores*', desc: '랭킹을 저장할 scores 배열 (크기 10).' },
+          ],
+          ret: 'void',
+          example: `<span class="code-type">scores</span> list[<span class="code-num">10</span>];
+<span class="code-fn">Load_ranking</span>(list);
+<span class="code-fn">printf</span>(<span class="code-str">"1위: %s (%d점)\n"</span>, list[<span class="code-num">0</span>].nickname, list[<span class="code-num">0</span>].score);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Load_ranking</span>(<span class="code-type">scores</span>* l) {
+    (<span class="code-kw">void</span>)<span class="code-fn">freopen</span>(<span class="code-str">&quot;ranking.txt&quot;</span>, <span class="code-str">&quot;r&quot;</span>, stdin);  <span class="code-cm">// 읽기 모드</span>
+    <span class="code-cm">// 파일에서 데이터 읽기</span>
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%s&quot;</span>, l[i].nickname);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; <span class="code-num">10</span>; j++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;l[j].score);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> k = <span class="code-num">0</span>; k &lt; <span class="code-num">10</span>; k++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;l[k].time);
+    }
+}`
+        },
+        {
+          name: 'Save_ranking',
+          sig: 'void Save_ranking(scores* l)',
+          brief: 'ranking.txt에 랭킹 데이터 저장',
+          desc: '<code>ranking.txt</code>를 쓰기 모드로 열고, <code>l</code> 배열의 닉네임 10개, 점수 10개, 시간 10개를 줄 단위로 저장합니다.',
+          params: [
+            { name: 'l', type: 'scores*', desc: '저장할 랭킹 데이터 배열 (크기 10).' },
+          ],
+          ret: 'void',
+          example: `<span class="code-type">scores</span> list[<span class="code-num">10</span>];
+<span class="code-fn">Load_ranking</span>(list);
+<span class="code-cm">// ... 데이터 수정 ...</span>
+<span class="code-fn">Save_ranking</span>(list);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Save_ranking</span>(<span class="code-type">scores</span>* l) {
+    FILE* fp = <span class="code-fn">fopen</span>(<span class="code-str">&quot;ranking.txt&quot;</span>, <span class="code-str">&quot;w&quot;</span>);
+    <span class="code-kw">if</span> (fp == <span class="code-kw">NULL</span>) {
+        <span class="code-fn">printf</span>(<span class="code-str">&quot;파일 열기 실패\n&quot;</span>);
+        <span class="code-kw">return</span>;
+    }
+    <span class="code-cm">// 랭킹 10개를 파일에 저장</span>
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        <span class="code-fn">fprintf</span>(fp, <span class="code-str">&quot;%s\n&quot;</span>, l[i].nickname);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; <span class="code-num">10</span>; j++) {
+        <span class="code-fn">fprintf</span>(fp, <span class="code-str">&quot;%d\n&quot;</span>, l[j].score);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> k = <span class="code-num">0</span>; k &lt; <span class="code-num">10</span>; k++) {
+        <span class="code-fn">fprintf</span>(fp, <span class="code-str">&quot;%d\n&quot;</span>, l[k].time);
+    }
+    <span class="code-fn">fclose</span>(fp);  <span class="code-cm">// 파일 닫기</span>
+}`
+        },
+        {
+          name: 'Compare_ranking',
+          sig: 'void Compare_ranking(GameState* g)',
+          brief: '현재 점수를 랭킹에 삽입·정렬·저장',
+          desc: '현재 게임의 점수가 10위 점수보다 낮으면 즉시 반환합니다. 동점 시에는 플레이 시간이 짧은 쪽이 높은 순위를 가집니다. 삽입 위치를 찾아 배열을 시프트하고 <code>Save_ranking()</code>으로 저장합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 (점수·시간·닉네임 포함).' },
+          ],
+          ret: 'void',
+          example: `<span class="code-kw">if</span> (game.score_count == <span class="code-num">0</span>) {
+    <span class="code-fn">Compare_ranking</span>(&game);
+    game.score_count = <span class="code-num">1</span>;
+}`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Compare_ranking</span>(<span class="code-type">GameState</span>* g) { <span class="code-cm">// 현재 점수가 10등보다 낮으면 탈락</span>
+    <span class="code-type">scores</span> l[<span class="code-num">10</span>];
+    <span class="code-fn">Load_ranking</span>(l);
+    <span class="code-kw">if</span> (g-&gt;score &lt; l[<span class="code-num">9</span>].score) {
+        <span class="code-kw">return</span>;
+    }
+    <span class="code-kw">if</span> (g-&gt;score == l[<span class="code-num">9</span>].score) { <span class="code-cm">// 점수가 같을 경우: 시간비교</span>
+        <span class="code-kw">if</span> ((<span class="code-kw">int</span>)g-&gt;time &gt; l[<span class="code-num">9</span>].time) {
+            <span class="code-kw">return</span>;
+        }
+    }
+    l[<span class="code-num">9</span>].score = g-&gt;score;
+    l[<span class="code-num">9</span>].time = (<span class="code-kw">int</span>)g-&gt;time;
+    <span class="code-fn">strcpy</span>(l[<span class="code-num">9</span>].nickname, g-&gt;my_score.nickname);
+    <span class="code-type">scores</span> temp = l[<span class="code-num">9</span>];
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">8</span>; i &gt;= <span class="code-num">0</span>; i--) {
+        <span class="code-kw">if</span> (temp.score &gt; l[i].score) { <span class="code-cm">// 점수가 더 크다면 값 이동</span>
+            l[i + <span class="code-num">1</span>] = l[i];
+            <span class="code-kw">if</span> (i == <span class="code-num">0</span>) l[<span class="code-num">0</span>] = temp;
+        }
+        <span class="code-kw">else</span> <span class="code-kw">if</span> (temp.score == l[i].score) { <span class="code-cm">// 점수가 같으면 시간비교</span>
+            <span class="code-kw">if</span> (temp.time &lt; l[i].time) {
+                l[i + <span class="code-num">1</span>] = l[i]; <span class="code-cm">// 기존 값 뒤로 이동</span>
+                <span class="code-kw">if</span> (i == <span class="code-num">0</span>) l[<span class="code-num">0</span>] = temp;
+            }
+            <span class="code-kw">else</span> {
+                l[i + <span class="code-num">1</span>] = temp;
+                <span class="code-kw">break</span>;
+            }
+        }
+        <span class="code-kw">else</span> {
+            l[i + <span class="code-num">1</span>] = temp;
+            <span class="code-kw">break</span>;
+        }
+    }
+    <span class="code-fn">Save_ranking</span>(l);
+}`
+        },
+      ]
+    },
+    {
+      id: 'player',
+      icon: '🧍',
+      name: 'Player',
+      desc: '키보드 입력 처리, 플레이어 이동·점프·충돌, 피격 및 무적 상태를 관리합니다. (player.c)',
+      fns: [
+        {
+          name: 'Init_keyboard',
+          sig: 'void Init_keyboard(void)',
+          brief: '키 상태 배열 초기화',
+          desc: '전역 <code>key[ALLEGRO_KEY_MAX]</code> 배열을 0으로 초기화합니다.',
+          params: [],
+          ret: 'void',
+          example: `<span class="code-fn">al_install_keyboard</span>();
+<span class="code-fn">Init_keyboard</span>();`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_keyboard</span>()
+{
+    <span class="code-fn">memset</span>(key, <span class="code-num">0</span>, <span class="code-fn">sizeof</span>(key));
+}`
+        },
+        {
+          name: 'Update_keyboard',
+          sig: 'void Update_keyboard(ALLEGRO_EVENT* event)',
+          brief: '이벤트로 키 상태 배열 갱신',
+          desc: 'TIMER 이벤트에서 <code>KEY_SEEN</code> 비트를 클리어하여 단발 감지를 구현하고, KEY_DOWN 시 <code>KEY_SEEN | KEY_DOWN</code>, KEY_UP 시 <code>KEY_DOWN</code> 비트를 해제합니다.',
+          params: [
+            { name: 'event', type: 'ALLEGRO_EVENT*', desc: '처리할 Allegro 이벤트 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Update_keyboard</span>(&ev);
+<span class="code-kw">if</span> (key[ALLEGRO_KEY_LEFT]) player.x -= PLAYER_SPEED;`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_keyboard</span>(<span class="code-type">ALLEGRO_EVENT</span>* event)
+{
+    <span class="code-kw">switch</span> (event-&gt;type)
+    {
+    <span class="code-kw">case</span> ALLEGRO_EVENT_TIMER:
+        <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; ALLEGRO_KEY_MAX; i++)
+            key[i] &amp;= ~KEY_SEEN;
+        <span class="code-kw">break</span>;
+
+    <span class="code-kw">case</span> ALLEGRO_EVENT_KEY_DOWN:
+        key[event-&gt;keyboard.keycode] = KEY_SEEN | KEY_DOWN;
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> ALLEGRO_EVENT_KEY_UP:
+        key[event-&gt;keyboard.keycode] &amp;= ~KEY_DOWN;
+        <span class="code-kw">break</span>;
+    }
+}`
+        },
+        {
+          name: 'Init_player',
+          sig: 'void Init_player(GameState* g)',
+          brief: '플레이어 초기 상태 설정',
+          desc: '플레이어 위치를 화면 중앙 하단으로 설정하고, 속도·점프·무적·사격 타이머·방향 등을 초기값으로 설정합니다. 생명력(<code>life</code>)은 건드리지 않습니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '초기화할 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Init_player</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_player</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-cm">// player 구조체 속 멤버 변수들 초기화</span>
+    <span class="code-type">Player</span>* player = &amp;g-&gt;player;
+
+    player-&gt;x = SCREEN_W / <span class="code-num">2</span> - PLAYER_WIDE / <span class="code-num">2</span>;   <span class="code-cm">// 플레이어 바닥 중앙 위치</span>
+    player-&gt;y = GROUND_Y - PLAYER_HEIGHT;
+    player-&gt;dy = <span class="code-num">0</span>;
+    player-&gt;isJumping = <span class="code-kw">false</span>;
+    <span class="code-cm">// reset game에만 player.life = 3 해주고 나머지는 생명력 초기화 X</span>
+    <span class="code-cm">//if (g-&gt;level == STAGE1) player-&gt;life = 3;</span>
+    <span class="code-cm">//player-&gt;life = 3;</span>
+    player-&gt;isAlive = <span class="code-kw">true</span>;
+    player-&gt;isInvincible = <span class="code-kw">false</span>;
+    player-&gt;invincibleTime = <span class="code-num">0</span>;
+    player-&gt;shotTimer = <span class="code-num">0</span>;  <span class="code-cm">// 총알 쿨타임 초기화</span>
+    player-&gt;facingRight = <span class="code-kw">true</span>;  <span class="code-cm">// 초기 방향</span>
+    player-&gt;isJumping = <span class="code-kw">false</span>;
+
+}`
+        },
+        {
+          name: 'Update_player',
+          sig: 'void Update_player(GameState* g)',
+          brief: '매 프레임 플레이어 상태 업데이트',
+          desc: '← → 키로 수평 이동, ↑ 키로 점프, Z 키로 총알 발사(5프레임 쿨타임)를 처리합니다. 중력을 적용하여 낙하·착지를 처리하며, 무적 타이머 감소와 근접 적 충돌 검사도 수행합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Update_player</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_player</span>(<span class="code-type">GameState</span>* g)
+{
+    <span class="code-type">Player</span>* player = &amp;g-&gt;player;
+
+    <span class="code-kw">if</span> (key[ALLEGRO_KEY_LEFT]) {
+        player-&gt;facingRight = <span class="code-kw">false</span>;
+
+        <span class="code-kw">if</span> (player-&gt;x &lt;= <span class="code-num">0</span>) {
+            player-&gt;x = <span class="code-num">0</span>;
+        }
+        <span class="code-kw">else</span> {
+            player-&gt;x -= PLAYER_SPEED;
+        }
+
+        <span class="code-fn">Check_collision_X</span>(g);
+    }
+
+
+    <span class="code-kw">if</span> (key[ALLEGRO_KEY_RIGHT]) {
+        player-&gt;facingRight = <span class="code-kw">true</span>;
+        <span class="code-kw">if</span> (player-&gt;x + PLAYER_WIDE &gt;= SCREEN_W) {
+            player-&gt;x = SCREEN_W - PLAYER_WIDE;
+        }
+        <span class="code-kw">else</span> {
+            player-&gt;x += PLAYER_SPEED; <span class="code-cm">// else 추가 계속 움직이지않고 멈춤</span>
+        }
+        <span class="code-fn">Check_collision_X</span>(g);
+    }
+
+    <span class="code-kw">bool</span> onPlatform = <span class="code-kw">false</span>; <span class="code-cm">// 발판 위에 있는지 확인</span>
+
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+        <span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+        <span class="code-cm">// 크기가 0이면 실제 없는 객체 건너뜀</span>
+        <span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+
+        <span class="code-kw">if</span> (player-&gt;x &lt; obj.x + obj.w &amp;&amp;
+            player-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+            player-&gt;y + PLAYER_HEIGHT == obj.y)
+        {
+            onPlatform = <span class="code-kw">true</span>;   <span class="code-cm">// 발판 위에 있음</span>
+        }
+    }
+
+    <span class="code-kw">if</span> (player-&gt;y + PLAYER_HEIGHT &lt; GROUND_Y &amp;&amp; !onPlatform) {
+        player-&gt;isJumping = <span class="code-kw">true</span>;
+    }
+
+    <span class="code-cm">// 점프 ------------------------------------</span>
+    <span class="code-kw">if</span> (key[ALLEGRO_KEY_UP] &amp;&amp; !player-&gt;isJumping) {
+        player-&gt;dy = -<span class="code-num">16.5</span>;
+        player-&gt;isJumping = <span class="code-kw">true</span>;
+    }
+
+    <span class="code-kw">if</span> (player-&gt;isJumping) {
+        player-&gt;dy += GRAVITY;
+        player-&gt;y += player-&gt;dy;
+
+        <span class="code-fn">Check_collision_Y</span>(g);
+
+        <span class="code-kw">if</span> (player-&gt;y &gt;= GROUND_Y - PLAYER_HEIGHT) {
+            player-&gt;y = GROUND_Y - PLAYER_HEIGHT;
+            player-&gt;dy = <span class="code-num">0</span>;
+            player-&gt;isJumping = <span class="code-kw">false</span>;
+        }
+        <span class="code-kw">if</span> (player-&gt;y &gt;= GROUND_Y) {
+            player-&gt;dy = <span class="code-num">0</span>;
+        }
+    }
+
+    <span class="code-cm">//------------------------------------</span>
+
+    <span class="code-kw">if</span> (player-&gt;shotTimer &gt; <span class="code-num">0</span>) {
+        player-&gt;shotTimer--;
+    }
+
+    <span class="code-kw">else</span> <span class="code-kw">if</span> (key[ALLEGRO_KEY_Z]) {
+        player-&gt;shotTimer = <span class="code-num">5</span>;
+        <span class="code-fn">Player_fire_bullets</span>(g, player-&gt;x, player-&gt;y + <span class="code-num">42</span>, player-&gt;facingRight);
+    }
+
+    <span class="code-cm">// life 및 invincible 확인 ----------------------</span>
+
+    <span class="code-fn">Check_close_enemy_collision</span>(g);
+
+    <span class="code-kw">if</span> (player-&gt;isInvincible &amp;&amp; player-&gt;invincibleTime &gt; <span class="code-num">0</span>) {
+        player-&gt;invincibleTime--;
+    }
+    <span class="code-kw">else</span> {
+        player-&gt;isInvincible = <span class="code-kw">false</span>;
+    }
+}`
+        },
+        {
+          name: 'Revival',
+          sig: 'void Revival(GameState* g)',
+          brief: '플레이어 부활 무적 모드 활성화 (2초)',
+          desc: '<code>isInvincible = true</code>, <code>invincibleTime = 2 * FPS</code>로 설정합니다. <code>Is_attacked()</code> 내부에서 자동 호출됩니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-kw">if</span> (player->life > <span class="code-num">0</span>) {
+    <span class="code-fn">Revival</span>(g);
+}`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Revival</span>(<span class="code-type">GameState</span>* g) {
+    g-&gt;player.isInvincible = <span class="code-kw">true</span>;
+    g-&gt;player.invincibleTime = <span class="code-num">2</span> * FPS;
+}`
+        },
+        {
+          name: 'Is_attacked',
+          sig: 'void Is_attacked(GameState* g)',
+          brief: '플레이어 피격 처리',
+          desc: '무적 상태면 즉시 반환합니다. 생명력을 1 감소 후 <code>Revival()</code>로 무적을 부여합니다. 생명력이 0이 되면 <code>g->game_over = true</code>로 설정합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Is_attacked</span>(g);
+<span class="code-kw">if</span> (g->game_over) scene = SCENE_OVER;`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Is_attacked</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-type">Player</span>* player = &amp;(g-&gt;player);
+    <span class="code-kw">if</span> (player-&gt;isInvincible) {
+        <span class="code-kw">return</span>;
+    }
+    <span class="code-kw">if</span> (player-&gt;life) {
+        player-&gt;life--;
+
+        <span class="code-kw">if</span> (player-&gt;life &gt; <span class="code-num">0</span>) {
+            <span class="code-fn">Revival</span>(g);
+        }
+        <span class="code-kw">else</span> {  <span class="code-cm">// 남은 목숨이 없을 경우</span>
+            <span class="code-cm">// 게임 종료</span>
+            g-&gt;game_over = <span class="code-kw">true</span>;
+        }
+    }
+}`
+        },
+        {
+          name: 'Check_close_enemy_collision',
+          sig: 'void Check_close_enemy_collision(GameState* g)',
+          brief: '플레이어-근접적 충돌 감지',
+          desc: '살아있는 모든 적과 플레이어의 AABB 충돌을 확인하고, 충돌 시 <code>Is_attacked()</code>를 호출합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-cm">// Update_player() 내부에서 자동 호출</span>
+<span class="code-fn">Check_close_enemy_collision</span>(g);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Check_close_enemy_collision</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-type">Enemy</span>* enemy = g-&gt;enemies.enemy;
+    <span class="code-kw">int</span> now_enemy = g-&gt;enemies.now_enemy;
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; now_enemy; ++i) {
+        <span class="code-kw">if</span> (!enemy[i].isAlive) <span class="code-kw">continue</span>;
+
+        <span class="code-cm">// enemy와 충돌 판정</span>
+        <span class="code-kw">if</span> (g-&gt;player.x &lt; enemy[i].x + ENEMY_WEIGHT &amp;&amp;
+            g-&gt;player.x + PLAYER_WIDE &gt; enemy[i].x &amp;&amp;
+            g-&gt;player.y &lt; enemy[i].y + ENEMY_HEIGHT &amp;&amp;
+            g-&gt;player.y + PLAYER_HEIGHT &gt; enemy[i].y) {
+
+            <span class="code-cm">// 무적 상태 아닐 경우 Is_attacked() 호출</span>
+            <span class="code-kw">if</span> (!g-&gt;player.isInvincible) {
+                <span class="code-fn">Is_attacked</span>(g);
+            }
+        }
+    }
+}`
+        },
+        {
+          name: 'Check_collision_X',
+          sig: 'void Check_collision_X(GameState* g)',
+          brief: '수평 이동 시 지형 충돌 처리',
+          desc: '이동 방향에 따라 오브젝트 좌우에 플레이어를 정렬합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `player->x += PLAYER_SPEED;
+<span class="code-fn">Check_collision_X</span>(g);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Check_collision_X</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-type">Player</span>* player = &amp;g-&gt;player;
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; ++i) {
+        <span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+        <span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+        <span class="code-kw">if</span> (player-&gt;x &lt; obj.x + obj.w &amp;&amp;
+            player-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+            player-&gt;y &lt; obj.y + obj.h &amp;&amp;
+            player-&gt;y + PLAYER_HEIGHT &gt; obj.y)
+        {
+            <span class="code-kw">if</span> (player-&gt;facingRight) {
+                player-&gt;x = obj.x - PLAYER_WIDE;
+            }
+
+            <span class="code-kw">else</span> {
+                player-&gt;x = obj.x + obj.w;
+            }
+        }
+    }
+}`
+        },
+        {
+          name: 'Check_collision_Y',
+          sig: 'void Check_collision_Y(GameState* g)',
+          brief: '수직 이동(점프/낙하) 시 지형 충돌 처리',
+          desc: '<code>dy > 0</code>(낙하)이면 오브젝트 위, <code>dy < 0</code>(상승)이면 아래에 위치시키고 속도를 0으로 만듭니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `player->y += player->dy;
+<span class="code-fn">Check_collision_Y</span>(g);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Check_collision_Y</span>(<span class="code-type">GameState</span>* g)
+{
+    <span class="code-type">Player</span>* player = &amp;g-&gt;player;
+
+    <span class="code-cm">// 모든 장애물 검사</span>
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+        <span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+        <span class="code-cm">// 없는 장애물은 무시</span>
+        <span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+
+        <span class="code-kw">if</span> (player-&gt;x  &lt; obj.x + obj.w &amp;&amp;
+            player-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+            player-&gt;y &lt; obj.y + obj.h &amp;&amp;
+            player-&gt;y + PLAYER_HEIGHT &gt; obj.y)
+        {
+
+            <span class="code-kw">if</span> (player-&gt;dy &gt; <span class="code-num">0</span>) {
+
+                player-&gt;y = obj.y - PLAYER_HEIGHT;
+
+
+                player-&gt;dy = <span class="code-num">0</span>;
+
+
+                player-&gt;isJumping = <span class="code-kw">false</span>;
+            }
+            <span class="code-kw">else</span> <span class="code-kw">if</span> (player-&gt;dy &lt; <span class="code-num">0</span>) {
+
+                player-&gt;y = obj.y + obj.h;
+
+                player-&gt;dy = <span class="code-num">0</span>;
+
+                player-&gt;isJumping = <span class="code-kw">false</span>;
+            }
+        }
+    }
+}`
+        },
+      ]
+    },
+    {
+      id: 'map',
+      icon: '🗺️',
+      name: 'Map',
+      desc: '각 스테이지의 지형 오브젝트(발판·장벽) 배치를 초기화합니다. (map.c)',
+      fns: [
+        {
+          name: 'Init_stage1_map',
+          sig: 'void Init_stage1_map(GameState* g)',
+          brief: 'Stage 1 지형 초기화 — 발판 4개',
+          desc: '모든 맵 오브젝트를 0으로 클리어한 뒤 Stage 1의 발판 4개를 설정합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '맵을 초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_stage1_map</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_stage1_map</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		g-&gt;stage_map.objects[i] = (<span class="code-type">map</span>){ <span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span> };
+	}
+	g-&gt;stage_map.objects[<span class="code-num">0</span>] = (<span class="code-type">map</span>){ <span class="code-num">911</span>,<span class="code-num">439</span>,<span class="code-num">195</span>,<span class="code-num">12</span> };
+	g-&gt;stage_map.objects[<span class="code-num">1</span>] = (<span class="code-type">map</span>){ <span class="code-num">610</span>,<span class="code-num">391</span>,<span class="code-num">196</span>,<span class="code-num">12</span> };
+	g-&gt;stage_map.objects[<span class="code-num">2</span>] = (<span class="code-type">map</span>){ <span class="code-num">292</span>,<span class="code-num">346</span>,<span class="code-num">193</span>,<span class="code-num">12</span> };
+	g-&gt;stage_map.objects[<span class="code-num">3</span>] = (<span class="code-type">map</span>){ <span class="code-num">34</span>,<span class="code-num">198</span>,<span class="code-num">214</span>,<span class="code-num">11</span> };
+}`
+        },
+        {
+          name: 'Init_stage2_map',
+          sig: 'void Init_stage2_map(GameState* g)',
+          brief: 'Stage 2 지형 초기화 — 오브젝트 12개',
+          desc: '왼쪽 언덕, 중앙 플랫폼, 오른쪽 절벽 등 다층 구조 12개 오브젝트를 배치합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '맵을 초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_stage2_map</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_stage2_map</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		g-&gt;stage_map.objects[i] = (<span class="code-type">map</span>){ <span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span> };
+	}
+	g-&gt;stage_map.objects[<span class="code-num">0</span>] = (<span class="code-type">map</span>){ <span class="code-num">76</span>,<span class="code-num">331</span>,<span class="code-num">270</span>,<span class="code-num">47</span> };
+	g-&gt;stage_map.objects[<span class="code-num">1</span>] = (<span class="code-type">map</span>){ <span class="code-num">93</span>,<span class="code-num">356</span>,<span class="code-num">238</span>,<span class="code-num">44</span> };
+	g-&gt;stage_map.objects[<span class="code-num">2</span>] = (<span class="code-type">map</span>){ <span class="code-num">128</span>,<span class="code-num">377</span>,<span class="code-num">167</span>,<span class="code-num">46</span> };
+	g-&gt;stage_map.objects[<span class="code-num">3</span>] = (<span class="code-type">map</span>){ <span class="code-num">159</span>,<span class="code-num">409</span>,<span class="code-num">84</span>,<span class="code-num">31</span> };
+	g-&gt;stage_map.objects[<span class="code-num">4</span>] = (<span class="code-type">map</span>){ <span class="code-num">171</span>,<span class="code-num">429</span>,<span class="code-num">39</span>,<span class="code-num">24</span> };
+
+	g-&gt;stage_map.objects[<span class="code-num">5</span>] = (<span class="code-type">map</span>){ <span class="code-num">439</span>,<span class="code-num">517</span>,<span class="code-num">322</span>,<span class="code-num">117</span> };
+
+	g-&gt;stage_map.objects[<span class="code-num">6</span>] = (<span class="code-type">map</span>){ <span class="code-num">834</span>,<span class="code-num">567</span>,<span class="code-num">500</span>,<span class="code-num">100</span> };
+	g-&gt;stage_map.objects[<span class="code-num">7</span>] = (<span class="code-type">map</span>){ <span class="code-num">1022</span>,<span class="code-num">526</span>,<span class="code-num">117</span>,<span class="code-num">56</span> };
+	g-&gt;stage_map.objects[<span class="code-num">8</span>] = (<span class="code-type">map</span>){ <span class="code-num">1056</span>,<span class="code-num">483</span>,<span class="code-num">59</span>,<span class="code-num">96</span> };
+
+	g-&gt;stage_map.objects[<span class="code-num">9</span>] = (<span class="code-type">map</span>){ <span class="code-num">926</span>,<span class="code-num">310</span>,<span class="code-num">251</span>,<span class="code-num">72</span> };
+	g-&gt;stage_map.objects[<span class="code-num">10</span>] = (<span class="code-type">map</span>){ <span class="code-num">982</span>,<span class="code-num">337</span>,<span class="code-num">139</span>,<span class="code-num">78</span> };
+	g-&gt;stage_map.objects[<span class="code-num">11</span>] = (<span class="code-type">map</span>){ <span class="code-num">1034</span>,<span class="code-num">396</span>,<span class="code-num">45</span>,<span class="code-num">34</span> };
+}`
+        },
+        {
+          name: 'Init_stage3_map',
+          sig: 'void Init_stage3_map(GameState* g)',
+          brief: 'Stage 3 지형 초기화 — 계단형 9개',
+          desc: '화면 왼쪽 하단에서 오른쪽 상단으로 이어지는 계단 구조 9개를 배치합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '맵을 초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_stage3_map</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_stage3_map</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		g-&gt;stage_map.objects[i] = (<span class="code-type">map</span>){ <span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span> };
+	}
+	g-&gt;stage_map.objects[<span class="code-num">0</span>] = (<span class="code-type">map</span>){ <span class="code-num">143</span>, <span class="code-num">396</span>, <span class="code-num">132</span>, <span class="code-num">95</span> };
+	g-&gt;stage_map.objects[<span class="code-num">1</span>] = (<span class="code-type">map</span>){ <span class="code-num">83</span>, <span class="code-num">440</span>, <span class="code-num">60</span>, <span class="code-num">52</span> };
+	g-&gt;stage_map.objects[<span class="code-num">2</span>] = (<span class="code-type">map</span>){ <span class="code-num">460</span>, <span class="code-num">459</span>, <span class="code-num">308</span> ,<span class="code-num">54</span> };
+	g-&gt;stage_map.objects[<span class="code-num">3</span>] = (<span class="code-type">map</span>){ <span class="code-num">585</span>, <span class="code-num">413</span>, <span class="code-num">95</span>, <span class="code-num">44</span> };
+	g-&gt;stage_map.objects[<span class="code-num">4</span>] = (<span class="code-type">map</span>){ <span class="code-num">718</span>, <span class="code-num">363</span>, <span class="code-num">264</span>, <span class="code-num">69</span> };
+	g-&gt;stage_map.objects[<span class="code-num">5</span>] = (<span class="code-type">map</span>){ <span class="code-num">795</span>, <span class="code-num">318</span>, <span class="code-num">85</span>, <span class="code-num">60</span> };
+	g-&gt;stage_map.objects[<span class="code-num">6</span>] = (<span class="code-type">map</span>){ <span class="code-num">914</span>, <span class="code-num">285</span>, <span class="code-num">286</span>, <span class="code-num">74</span> };
+	g-&gt;stage_map.objects[<span class="code-num">7</span>] = (<span class="code-type">map</span>){ <span class="code-num">983</span>, <span class="code-num">229</span>, <span class="code-num">35</span>, <span class="code-num">70</span> };
+	g-&gt;stage_map.objects[<span class="code-num">8</span>] = (<span class="code-type">map</span>){ <span class="code-num">1018</span>, <span class="code-num">183</span>, <span class="code-num">101</span>, <span class="code-num">110</span> };
+
+}`
+        },
+        {
+          name: 'Init_stageBOSS_map',
+          sig: 'void Init_stageBOSS_map(GameState* g)',
+          brief: 'BOSS 스테이지 지형 초기화 — 플랫폼 6개',
+          desc: '왼쪽 계단형 구조물과 중앙·오른쪽 플랫폼으로 구성된 보스전 공간 6개를 배치합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '맵을 초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_stageBOSS_map</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_stageBOSS_map</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		g-&gt;stage_map.objects[i] = (<span class="code-type">map</span>){ <span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span>,<span class="code-num">0</span> };
+	}
+	g-&gt;stage_map.objects[<span class="code-num">0</span>] = (<span class="code-type">map</span>){ <span class="code-num">301</span>, <span class="code-num">583</span>, <span class="code-num">76</span> ,<span class="code-num">70</span> };
+	g-&gt;stage_map.objects[<span class="code-num">1</span>] = (<span class="code-type">map</span>){ <span class="code-num">192</span>, <span class="code-num">539</span>, <span class="code-num">106</span>, <span class="code-num">115</span> };
+	g-&gt;stage_map.objects[<span class="code-num">2</span>] = (<span class="code-type">map</span>){ <span class="code-num">54</span>, <span class="code-num">555</span>, <span class="code-num">135</span>, <span class="code-num">100</span> };
+	g-&gt;stage_map.objects[<span class="code-num">3</span>] = (<span class="code-type">map</span>){ <span class="code-num">455</span>, <span class="code-num">508</span>, <span class="code-num">210</span>, <span class="code-num">15</span> };
+	g-&gt;stage_map.objects[<span class="code-num">4</span>] = (<span class="code-type">map</span>){ <span class="code-num">457</span>, <span class="code-num">388</span>, <span class="code-num">171</span>, <span class="code-num">18</span> };
+	g-&gt;stage_map.objects[<span class="code-num">5</span>] = (<span class="code-type">map</span>){ <span class="code-num">305</span>, <span class="code-num">320</span>, <span class="code-num">155</span>, <span class="code-num">13</span> };
+}`
+        },
+      ]
+    },
+    {
+      id: 'enemy',
+      icon: '👾',
+      name: 'Enemy',
+      desc: '적 생성·이동·충돌·발사 등 적 관련 모든 로직을 처리합니다. (Enemy.c)',
+      fns: [
+        {
+          name: 'Random_i',
+          sig: 'int Random_i(int min, int max)',
+          brief: '정수 범위 난수 [min, max]',
+          desc: '<code>[min, max]</code> 범위의 정수 난수를 반환합니다.',
+          params: [
+            { name: 'min', type: 'int', desc: '난수 하한 (포함).' },
+            { name: 'max', type: 'int', desc: '난수 상한 (포함).' },
+          ],
+          ret: 'int',
+          example: `e->shotTimer = <span class="code-fn">Random_i</span>(<span class="code-num">90</span>, <span class="code-num">100</span>);`,
+          fullcode: `<span class="code-kw">int</span> <span class="code-fn">Random_i</span>(<span class="code-kw">int</span> min, <span class="code-kw">int</span> max) {
+	<span class="code-kw">return</span> (<span class="code-kw">int</span>)min + <span class="code-fn">rand</span>() % (max - min + <span class="code-num">1</span>);
+}`
+        },
+        {
+          name: 'Random_f',
+          sig: 'float Random_f(float min, float max)',
+          brief: '실수 범위 난수 [min, max]',
+          desc: '<code>[min, max]</code> 범위의 float 난수를 반환합니다.',
+          params: [
+            { name: 'min', type: 'float', desc: '난수 하한.' },
+            { name: 'max', type: 'float', desc: '난수 상한.' },
+          ],
+          ret: 'float',
+          example: `<span class="code-kw">float</span> i_x = <span class="code-fn">Random_f</span>(<span class="code-num">100</span>, <span class="code-num">1100</span>);`,
+          fullcode: `<span class="code-kw">float</span> <span class="code-fn">Random_f</span>(<span class="code-kw">float</span> min, <span class="code-kw">float</span> max) {
+	<span class="code-kw">return</span> min + <span class="code-fn">rand</span>() % (<span class="code-kw">int</span>)(max - min + <span class="code-num">1</span>);
+}`
+        },
+        {
+          name: 'Chk_e_collision_X',
+          sig: 'void Chk_e_collision_X(GameState* g, int target)',
+          brief: '적 수평 이동 시 지형 충돌 처리',
+          desc: '지정 적과 지형의 수평 충돌을 감지합니다. 충돌 시 플레이어 위치에 따라 점프를 유발하고 이동 방향으로 정렬합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'target', type: 'int', desc: '충돌 검사할 적의 인덱스.' },
+          ],
+          ret: 'void',
+          example: `e->x -= <span class="code-num">3</span>;
+<span class="code-fn">Chk_e_collision_X</span>(g, i);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Chk_e_collision_X</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">int</span> target) {
+	<span class="code-type">Enemy</span>* e = &amp;(g-&gt;enemies.enemy[target]);
+
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; ++i) {
+		<span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+		<span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+		<span class="code-kw">if</span> (e-&gt;x &lt; obj.x + obj.w &amp;&amp;
+			e-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+			e-&gt;y &lt; obj.y + obj.h &amp;&amp;
+			e-&gt;y + PLAYER_HEIGHT &gt; obj.y)
+		{
+
+			<span class="code-kw">if</span> (g-&gt;player.y &lt;= e-&gt;y) {
+				e-&gt;dy = -<span class="code-num">12</span>;
+				e-&gt;isJumping = <span class="code-kw">true</span>;
+			}
+
+			<span class="code-kw">if</span> (e-&gt;facingRight) {
+				e-&gt;x = obj.x - PLAYER_WIDE;
+			}
+
+			<span class="code-kw">else</span> {
+				e-&gt;x = obj.x + obj.w;
+			}
+		}
+
+	}
+}`
+        },
+        {
+          name: 'Chk_e_collision_Y',
+          sig: 'void Chk_e_collision_Y(GameState* g, int target)',
+          brief: '적 수직 이동 시 지형 충돌 처리',
+          desc: '낙하·상승 중 지형 충돌을 처리합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'target', type: 'int', desc: '충돌 검사할 적의 인덱스.' },
+          ],
+          ret: 'void',
+          example: `e->y += e->dy;
+<span class="code-fn">Chk_e_collision_Y</span>(g, i);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Chk_e_collision_Y</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">int</span> target)
+{
+	<span class="code-type">Enemy</span>* e = &amp;(g-&gt;enemies.enemy[target]);
+
+	<span class="code-cm">// 모든 장애물 검사</span>
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		<span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+		<span class="code-cm">// 없는 장애물은 무시</span>
+		<span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+
+		<span class="code-kw">if</span> (e-&gt;x &lt; obj.x + obj.w &amp;&amp;
+			e-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+			e-&gt;y &lt; obj.y + obj.h &amp;&amp;
+			e-&gt;y + PLAYER_HEIGHT &gt; obj.y)
+		{
+			<span class="code-kw">if</span> (e-&gt;dy &gt; <span class="code-num">0</span>) {
+
+				e-&gt;y = obj.y - PLAYER_HEIGHT;
+				e-&gt;dy = <span class="code-num">0</span>;
+				e-&gt;isJumping = <span class="code-kw">false</span>;
+			}
+			<span class="code-kw">else</span> <span class="code-kw">if</span> (e-&gt;dy &lt; <span class="code-num">0</span>) {
+
+				e-&gt;y = obj.y + obj.h;
+				e-&gt;dy = <span class="code-num">0</span>;
+				e-&gt;isJumping = <span class="code-kw">false</span>;
+			}
+		}
+	}
+}`
+        },
+        {
+          name: 'Move_enemy',
+          sig: 'void Move_enemy(GameState* g, int target)',
+          brief: '근접 적 이동 및 중력 적용',
+          desc: '<code>type == 0</code> 근접 적을 플레이어 방향으로 속도 3씩 이동시키고 중력을 적용합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'target', type: 'int', desc: '이동할 적의 인덱스.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Move_enemy</span>(g, i);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Move_enemy</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">int</span> target) {
+
+	<span class="code-type">Enemy</span>* e = &amp;(g-&gt;enemies.enemy[target]);
+	<span class="code-kw">float</span> player_x = g-&gt;player.x;
+	<span class="code-kw">float</span> player_y = g-&gt;player.y;
+
+	e-&gt;onPlatform = <span class="code-kw">false</span>;
+	<span class="code-kw">if</span>(e-&gt;type == <span class="code-num">0</span>){
+		<span class="code-kw">if</span> (e-&gt;x &gt; player_x) <span class="code-cm">//플레이어가 왼쪽에 있을 시</span>
+		{
+			e-&gt;facingRight = <span class="code-kw">false</span>;
+			e-&gt;x -= <span class="code-num">3</span>;
+			<span class="code-fn">Chk_e_collision_X</span>(g, target);
+		}
+		<span class="code-kw">else</span> <span class="code-kw">if</span> (e-&gt;x &lt; player_x) <span class="code-cm">//플레이어가 오른쪽에 있을 시 </span>
+		{
+			e-&gt;facingRight = <span class="code-kw">true</span>;
+			e-&gt;x += <span class="code-num">3</span>;
+			<span class="code-fn">Chk_e_collision_X</span>(g, target);
+		}
+	}
+
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) {
+		<span class="code-type">map</span> obj = g-&gt;stage_map.objects[i];
+
+		<span class="code-cm">// 크기가 0이면 실제 없는 객체 건너뜀</span>
+		<span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+		<span class="code-kw">if</span> (e-&gt;x &lt; obj.x + obj.w &amp;&amp;
+			e-&gt;x + PLAYER_WIDE &gt; obj.x &amp;&amp;
+			e-&gt;y + PLAYER_HEIGHT == obj.y)
+		{
+			e-&gt;onPlatform = <span class="code-kw">true</span>;   <span class="code-cm">// 발판 위에 있음</span>
+		}
+	}
+
+
+
+	<span class="code-kw">if</span> (e-&gt;y + PLAYER_HEIGHT &lt; GROUND_Y &amp;&amp; !e-&gt;onPlatform) {
+		e-&gt;isJumping = <span class="code-kw">true</span>;
+	}
+
+	<span class="code-kw">if</span> (e-&gt;isJumping) {
+		e-&gt;dy += <span class="code-num">0.5</span>;
+		e-&gt;y += e-&gt;dy;
+
+		<span class="code-fn">Chk_e_collision_Y</span>(g, target);
+
+		<span class="code-kw">if</span> (e-&gt;y &gt;= GROUND_Y - PLAYER_HEIGHT) {
+			e-&gt;y = GROUND_Y - PLAYER_HEIGHT;
+			e-&gt;dy = <span class="code-num">0</span>;
+			e-&gt;isJumping = <span class="code-kw">false</span>;
+		}
+		<span class="code-kw">if</span> (e-&gt;y &gt;= GROUND_Y) {
+			e-&gt;dy = <span class="code-num">0</span>;
+		}
+	}
+}`
+        },
+        {
+          name: 'Init_enemymanage',
+          sig: 'void Init_enemymanage(GameState* g)',
+          brief: '적 관리 구조체 초기화',
+          desc: '현재 스테이지에 맞는 최대 적 수를 설정하고, 현재 적 수·스폰 카운터·생존 적 수를 초기화합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_enemymanage</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_enemymanage</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-type">Enemy_manage</span>* em = &amp;(g-&gt;enemies);
+
+	em-&gt;max_enemy = Max_enemies[g-&gt;level];
+
+	em-&gt;now_enemy = <span class="code-num">0</span>;
+	em-&gt;spawn_cnt = <span class="code-num">30</span>;
+	em-&gt;cnt_enemy = <span class="code-num">0</span>;
+}`
+        },
+        {
+          name: 'Create_enemy',
+          sig: 'void Create_enemy(GameState* g)',
+          brief: '스폰 조건 충족 시 새 적 생성',
+          desc: '스폰 카운터가 0이고 현재까지 소황된 적 수가 최대치에 미치지 않으면 새 적을 생성합니다. 스테이지별 타입과 무작위 위치에 스폰합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Create_enemy</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Create_enemy</span>(<span class="code-type">GameState</span>* g) { <span class="code-cm">//적 생성</span>
+
+	<span class="code-type">Enemy_manage</span>* em = &amp;(g-&gt;enemies);
+	<span class="code-cm">//spawn 카운터가 0이 되고 현재 까지 생성한 적이 스테이지 별 할당 적 숫자에 도달하기 전이면 생성</span>
+	<span class="code-kw">if</span> (em-&gt;spawn_cnt == <span class="code-num">0</span> &amp;&amp; em-&gt;now_enemy &lt; em-&gt;max_enemy) {
+
+		<span class="code-type">Enemy</span>* new_enemy = &amp;(em-&gt;enemy[(em-&gt;now_enemy)++]);
+
+		new_enemy-&gt;isAlive = <span class="code-num">1</span>;
+		new_enemy-&gt;use = <span class="code-num">1</span>;
+		new_enemy-&gt;isJumping = <span class="code-kw">false</span>;
+		new_enemy-&gt;facingRight = <span class="code-num">0</span>;
+		new_enemy-&gt;dy = <span class="code-num">0</span>;
+		new_enemy-&gt;spawn = <span class="code-kw">true</span>;
+
+		<span class="code-kw">int</span> spawn_type[<span class="code-num">4</span>] = { <span class="code-num">0</span>, <span class="code-num">2</span>, <span class="code-num">1</span>, <span class="code-num">2</span> };
+		<span class="code-kw">int</span> now_spawn_type = spawn_type[g-&gt;level];
+		<span class="code-kw">if</span> (now_spawn_type == <span class="code-num">2</span>) now_spawn_type = <span class="code-fn">Random_i</span>(<span class="code-num">0</span>, <span class="code-num">1</span>);
+
+		new_enemy-&gt;type = now_spawn_type;
+
+		<span class="code-kw">if</span> (new_enemy-&gt;type) new_enemy-&gt;shotTimer = <span class="code-fn">Random_i</span>(<span class="code-num">90</span>, <span class="code-num">100</span>);
+		<span class="code-kw">else</span> new_enemy-&gt;shotTimer = <span class="code-num">0</span>;
+
+		<span class="code-cm">//spawn position random setting</span>
+
+		<span class="code-kw">float</span> i_x, i_y;
+		<span class="code-kw">bool</span> can_spawn;
+
+		<span class="code-kw">do</span> {
+			can_spawn = <span class="code-kw">false</span>;
+			i_x = <span class="code-fn">Random_f</span>(PLAYER_WIDE, SCREEN_W - PLAYER_WIDE);
+			i_y = <span class="code-fn">Random_f</span>(PLAYER_HEIGHT, GROUND_Y - PLAYER_HEIGHT);
+
+
+			<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_OBJECTS; i++) { <span class="code-cm">//모든 오브젝트와 겹칩이 없을떄 까지</span>
+
+				<span class="code-type">map</span>* obj = &amp;(g-&gt;stage_map.objects[i]);
+
+				<span class="code-kw">if</span> (i_x &lt; obj-&gt;x + obj-&gt;w &amp;&amp;
+					i_x + PLAYER_WIDE &gt; obj-&gt;x &amp;&amp;
+					i_y &lt; obj-&gt;y + obj-&gt;h &amp;&amp;
+					i_y + PLAYER_HEIGHT &gt; obj-&gt;y)
+				{
+					can_spawn = <span class="code-kw">true</span>;
+					<span class="code-kw">break</span>; 
+				}
+			}
+
+		} <span class="code-kw">while</span> (can_spawn);
+
+		new_enemy-&gt;x = i_x;
+		new_enemy-&gt;y = i_y;
+
+		em-&gt;cnt_enemy++;
+		em-&gt;spawn_cnt = <span class="code-fn">Random_i</span>(<span class="code-num">80</span>, <span class="code-num">100</span>);
+	}
+	em-&gt;spawn_cnt--;
+
+}`
+        },
+        {
+          name: 'Update_enemy',
+          sig: 'void Update_enemy(GameState* g)',
+          brief: '모든 적 상태 업데이트',
+          desc: '원거리 적은 쿨타임마다 발사, 근접 적은 플레이어 추적. 스폰 직후에는 착지를 먼저 우선으로 합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Update_enemy</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_enemy</span>(<span class="code-type">GameState</span>* g) { <span class="code-cm">//적 비트맵 변화</span>
+	<span class="code-type">Enemy_manage</span>* enemies = &amp;(g-&gt;enemies);
+	<span class="code-cm">//printf(&quot;cnt_enemy : %d, now_enemy : %d\n&quot;, g-&gt;enemies.cnt_enemy, g-&gt;enemies.now_enemy);</span>
+
+
+	<span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; enemies-&gt;now_enemy; i++)
+	{
+		<span class="code-type">Enemy</span>* e = &amp;(enemies-&gt;enemy[i]);
+
+		<span class="code-cm">//사망이라면 스킵</span>
+		<span class="code-kw">if</span> (e-&gt;isAlive == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+		<span class="code-fn">Check_bullet_collision</span>(g);
+
+		<span class="code-kw">float</span> player_x = g-&gt;player.x;
+		<span class="code-kw">float</span> player_y = g-&gt;player.y;
+		<span class="code-kw">float</span> enemy_x = g-&gt;enemies.enemy[i].x;
+		<span class="code-kw">float</span> enemy_y = g-&gt;enemies.enemy[i].y;
+
+		<span class="code-cm">//printf(&quot;%d enemey // x : %.1f, y : %.1f\n&quot;, i, e-&gt;x, e-&gt;y);</span>
+
+		<span class="code-kw">if</span> (!e-&gt;spawn)
+		{
+			<span class="code-kw">if</span> (e-&gt;type) {
+				<span class="code-cm">//원거리의 경우 제자리에서 총알 발사</span>
+				<span class="code-kw">if</span> (e-&gt;shotTimer == <span class="code-num">0</span>) {
+					<span class="code-fn">Enemy_fire_bullets</span>(g, enemy_x, enemy_y, player_x, player_y);
+
+					e-&gt;shotTimer = <span class="code-fn">Random_i</span>(<span class="code-num">100</span>, <span class="code-num">200</span>);
+				}
+				<span class="code-kw">else</span> e-&gt;shotTimer--;
+
+			}
+			<span class="code-kw">else</span>    <span class="code-fn">Move_enemy</span>(g, i);<span class="code-cm">//근접의 경우 플레이어 위치값을 토대로 움직임</span>
+		}
+		<span class="code-kw">else</span> {
+			<span class="code-fn">Move_enemy</span>(g, i);
+
+			<span class="code-kw">if</span> (e-&gt;isJumping == <span class="code-kw">false</span>) e-&gt;spawn = <span class="code-kw">false</span>;
+		}
+
+	}
+}`
+        },
+      ]
+    },
+    {
+      id: 'boss',
+      icon: '💀',
+      name: 'Boss',
+      desc: '보스 패턴 선택, 초기화, 매 프레임 상태 업데이트를 담당합니다. (boss.c)',
+      fns: [
+        {
+          name: 'Boss_pattern',
+          sig: 'void Boss_pattern(GameState* g)',
+          brief: '보스 공격 패턴 실행',
+          desc: '보스 위치에서 플레이어를 향해 총알을 발사합니다. 5패턴마다 잡몹을 소환하며, HP 10 이하 시 공격을 가속합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-kw">if</span> (boss->shotTimer == <span class="code-num">0</span>) {
+    <span class="code-fn">Boss_pattern</span>(g);
+}`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Boss_pattern</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-type">Boss</span>* boss = &amp;(g-&gt;boss);
+	<span class="code-kw">float</span> player_x = g-&gt;player.x;
+	<span class="code-kw">float</span> player_y = g-&gt;player.y;
+	<span class="code-kw">float</span> enemy_x = boss-&gt;x;
+	<span class="code-kw">float</span> enemy_y = boss-&gt;y;
+
+
+	<span class="code-fn">Enemy_fire_bullets</span>(g, enemy_x, enemy_y, player_x, player_y);
+	<span class="code-kw">if</span> (boss-&gt;pattern % <span class="code-num">5</span> == <span class="code-num">0</span>) {
+		<span class="code-fn">Create_enemy</span>(g);
+	}
+
+	boss-&gt;shotTimer = boss_p[(boss-&gt;pattern++) % <span class="code-num">10</span>];
+	<span class="code-kw">if</span> (boss-&gt;hp &lt;= <span class="code-num">10</span> || boss-&gt;shotTimer &gt; <span class="code-num">0</span>) {
+		boss-&gt;shotTimer--;
+	}
+}`
+        },
+        {
+          name: 'Init_boss',
+          sig: 'void Init_boss(GameState* g)',
+          brief: '보스 구조체 초기화',
+          desc: '보스 위치를 <code>(1030, 350)</code>으로, HP를 <code>BOSS_HP</code>로 설정하고 <code>isAlive = false</code>로 초기화합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_boss</span>(&game);
+game.boss.isAlive = <span class="code-kw">true</span>; <span class="code-cm">// BOSS 스테이지 진입 시</span>`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_boss</span>(<span class="code-type">GameState</span>* g) {
+
+	<span class="code-type">Boss</span>* boss = &amp;(g-&gt;boss);
+
+	boss-&gt;x = <span class="code-num">1030</span>;
+	boss-&gt;y = <span class="code-num">350</span>;
+	boss-&gt;hp = BOSS_HP;
+	boss-&gt;isAlive = <span class="code-kw">false</span>;
+	boss-&gt;shotTimer = <span class="code-num">100</span>;
+	boss-&gt;pattern = <span class="code-num">0</span>;
+
+}`
+        },
+        {
+          name: 'Update_boss',
+          sig: 'void Update_boss(GameState* g)',
+          brief: '매 프레임 보스 상태 업데이트',
+          desc: '보스 스테이지이고 보스가 살아있는 경우에만 동작합니다. 쿨타임이 0이면 패턴을 실행하고, HP가 0이 되면 사망 처리합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Update_boss</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_boss</span>(<span class="code-type">GameState</span>* g) {
+	<span class="code-type">Boss</span>* boss = &amp;(g-&gt;boss);
+	<span class="code-kw">if</span> (g-&gt;level == BOSS) {
+
+		<span class="code-kw">if</span> (boss-&gt;isAlive == <span class="code-num">1</span>)
+		{
+			<span class="code-kw">if</span> (boss-&gt;shotTimer == <span class="code-num">0</span>) {
+
+				<span class="code-fn">Boss_pattern</span>(g);
+			}
+			<span class="code-kw">else</span> boss-&gt;shotTimer--;
+
+			<span class="code-kw">if</span> (boss-&gt;hp == <span class="code-num">0</span>) {
+				boss-&gt;isAlive = <span class="code-num">0</span>;
+			}
+		}
+	}
+}`
+        },
+      ]
+    },
+    {
+      id: 'bullet',
+      icon: '💗',
+      name: 'Bullet',
+      desc: '플레이어·적 총알의 생성, 이동, 충돌 처리를 담당합니다. (bullet.c)',
+      fns: [
+        {
+          name: 'Init_bullets',
+          sig: 'void Init_bullets(GameState* g)',
+          brief: '총알 배열 초기화',
+          desc: '<code>MAX_BULLETS</code> 크기의 총알 배열을 모두 <code>used = false</code>로 초기화합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '초기화할 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_bullets</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_bullets</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_BULLETS; ++i) {
+        bullets[i].used = <span class="code-kw">false</span>;
+    }
+}`
+        },
+        {
+          name: 'Player_fire_bullets',
+          sig: 'void Player_fire_bullets(GameState* g, float x, float y, bool facingRight)',
+          brief: '플레이어 총알 발사 (수평)',
+          desc: '미사용 슬롯을 찾아 총알을 생성합니다. <code>facingRight</code>에 따라 <code>±BULLET_SPEED</code>로 수평 발사합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'x, y', type: 'float', desc: '총알 발사 위치.' },
+            { name: 'facingRight', type: 'bool', desc: '오른쪽 방향이면 true.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Player_fire_bullets</span>(g, player->x, player->y + <span class="code-num">42</span>, player->facingRight);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Player_fire_bullets</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">float</span> x, <span class="code-kw">float</span> y, <span class="code-kw">bool</span> facingRight) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_BULLETS; ++i) {
+        <span class="code-kw">if</span> (!bullets[i].used) {
+            bullets[i].x = x;
+            bullets[i].y = y;
+            bullets[i].dx = facingRight ? BULLET_SPEED : -BULLET_SPEED; <span class="code-cm">// x방향 이동</span>
+            bullets[i].dy = <span class="code-num">0</span>;
+            bullets[i].player = <span class="code-kw">true</span>;
+            bullets[i].used = <span class="code-kw">true</span>;
+            <span class="code-kw">break</span>;
+        }
+    }
+}`
+        },
+        {
+          name: 'Enemy_fire_bullets',
+          sig: 'void Enemy_fire_bullets(GameState* g, float x, float y, float playerx, float playery)',
+          brief: '적/보스 총알 발사 (플레이어 추적)',
+          desc: '발사 위치에서 플레이어까지의 방향 벡터를 정규화하여 <code>dx, dy</code>를 설정합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'x, y', type: 'float', desc: '발사 위치.' },
+            { name: 'playerx, playery', type: 'float', desc: '플레이어 좌표 (조준 대상).' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Enemy_fire_bullets</span>(g, enemy_x, enemy_y, player_x, player_y);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Enemy_fire_bullets</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">float</span> x, <span class="code-kw">float</span> y, <span class="code-kw">float</span> playerx, <span class="code-kw">float</span> playery) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_BULLETS; ++i) {
+        <span class="code-kw">if</span> (!bullets[i].used) {
+            bullets[i].x = x;
+            bullets[i].y = y;
+            <span class="code-kw">float</span> diffx = playerx - x;
+            <span class="code-kw">float</span> diffy = playery - y;
+            <span class="code-kw">float</span> dist = <span class="code-fn">sqrtf</span>(diffx * diffx + diffy * diffy);
+
+            <span class="code-kw">if</span> (dist == <span class="code-num">0</span>) {
+                dist = <span class="code-num">1</span>;
+            }
+            bullets[i].dx = BULLET_SPEED * (diffx / dist);
+            bullets[i].dy = BULLET_SPEED * (diffy / dist);
+
+            bullets[i].player = <span class="code-kw">false</span>;
+            bullets[i].used = <span class="code-kw">true</span>;
+
+            <span class="code-kw">break</span>;
+        }
+    }
+}`
+        },
+        {
+          name: 'Update_bullets',
+          sig: 'void Update_bullets(GameState* g, float deltaTime)',
+          brief: '총알 이동 및 화면 밖/지형 제거',
+          desc: '총알 위치를 <code>dx * deltaTime</code>, <code>dy * deltaTime</code>씩 이동시킵니다. 화면 밖·지면 아래·지형 내부 진입 시 제거합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'deltaTime', type: 'float', desc: '프레임당 시간 배율 (FPS/15 권장).' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Update_bullets</span>(&game, (FPS / <span class="code-num">15</span>));`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_bullets</span>(<span class="code-type">GameState</span>* g, <span class="code-kw">float</span> deltaTime) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_BULLETS; i++) {
+        <span class="code-kw">if</span> (bullets[i].used) {
+            bullets[i].x += bullets[i].dx * deltaTime;
+            bullets[i].y += bullets[i].dy * deltaTime;
+
+            <span class="code-cm">// 화면 밖이면 제거</span>
+            <span class="code-kw">if</span> (bullets[i].x &lt; <span class="code-num">0</span> || bullets[i].x &gt; SCREEN_W || bullets[i].y &lt; <span class="code-num">0</span> || bullets[i].y &gt; SCREEN_H) {
+                bullets[i].used = <span class="code-kw">false</span>;
+            }
+            <span class="code-cm">// 땅에 닿으면 제거</span>
+            <span class="code-kw">if</span> (bullets[i].y &gt; GROUND_Y) {
+                bullets[i].used = <span class="code-kw">false</span>;
+            }
+
+            <span class="code-cm">// 지형지물에 닿으면 제거</span>
+            <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; MAX_OBJECTS; ++j) {
+                <span class="code-type">map</span> obj = g-&gt;stage_map.objects[j];
+
+                <span class="code-kw">if</span> (obj.w == <span class="code-num">0</span> || obj.h == <span class="code-num">0</span>) <span class="code-kw">continue</span>;
+
+                <span class="code-kw">if</span> ((bullets[i].x &lt; obj.x + obj.w &amp;&amp;
+                    bullets[i].x &gt; obj.x) &amp;&amp;
+                    (bullets[i].y &lt; obj.y + obj.h &amp;&amp;
+                        bullets[i].y &gt; obj.y)) {
+
+                    bullets[i].used = <span class="code-kw">false</span>;
+                }
+            }
+        }
+    }
+}`
+        },
+        {
+          name: 'Check_bullet_collision',
+          sig: 'void Check_bullet_collision(GameState* g)',
+          brief: '총알-적/플레이어/보스 충돌 처리',
+          desc: '플레이어 총알은 적·보스와 원형 충돌 검사 후 처치 시 점수 부여. 적 총알은 플레이어 충돌 시 <code>Is_attacked()</code> 호출.',
+          params: [{ name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Check_bullet_collision</span>(&game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Check_bullet_collision</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+    <span class="code-type">Player</span>* player = &amp;g-&gt;player;
+    <span class="code-type">Enemy</span>* enemy = g-&gt;enemies.enemy;
+    <span class="code-type">Enemy_manage</span>* enemies = &amp;g-&gt;enemies;
+    <span class="code-kw">int</span> now_enemy = g-&gt;enemies.now_enemy;
+    <span class="code-type">Boss</span>* boss = &amp;g-&gt;boss;
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; MAX_BULLETS; ++i) {
+        <span class="code-kw">if</span> (!bullets[i].used) <span class="code-kw">continue</span>;
+
+        <span class="code-kw">bool</span> hit = <span class="code-kw">false</span>; <span class="code-cm">// enemy 피격 확인 후 boss 피격 검사 건너뛰기 위한 변수</span>
+
+        <span class="code-cm">// player가 쏜 총알</span>
+        <span class="code-kw">if</span> (bullets[i].player) {
+
+            <span class="code-cm">// enemy 충돌 체크</span>
+            <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; now_enemy; ++j) {
+                <span class="code-kw">if</span> (!enemy[j].isAlive) <span class="code-kw">continue</span>;
+
+                <span class="code-kw">float</span> dx = bullets[i].x - (enemy[j].x + PLAYER_WIDE / <span class="code-num">2</span>);
+                <span class="code-kw">float</span> dy = bullets[i].y - (enemy[j].y + PLAYER_HEIGHT / <span class="code-num">2</span>);
+                <span class="code-kw">if</span> (dx * dx + dy * dy &lt; ENEMY_COLLISION_DIST * ENEMY_COLLISION_DIST) {
+                    bullets[i].used = <span class="code-kw">false</span>;
+                    enemy[j].isAlive = <span class="code-kw">false</span>;
+                    enemies-&gt;cnt_enemy--;
+                    <span class="code-kw">if</span>(g-&gt;level != BOSS) g-&gt;score += <span class="code-num">10</span>;
+
+                    <span class="code-kw">if</span> (enemies-&gt;cnt_enemy == <span class="code-num">0</span> &amp;&amp; boss-&gt;isAlive == <span class="code-kw">false</span> &amp;&amp; enemies-&gt;now_enemy == enemies-&gt;max_enemy) {
+                        g-&gt;stage_over = <span class="code-kw">true</span>;
+                    }
+
+                    hit = <span class="code-kw">true</span>;
+                    <span class="code-kw">break</span>;
+                }
+            }
+
+            <span class="code-kw">if</span> (hit) <span class="code-kw">continue</span>; <span class="code-cm">// enemy가 맞았다면 해당 총알은 검사 끝.</span>
+
+            <span class="code-cm">// boss 충돌 체크</span>
+            <span class="code-kw">if</span> (boss-&gt;isAlive) {
+                <span class="code-kw">float</span> dx = bullets[i].x - (boss-&gt;x + BOSS_WEIGHT / <span class="code-num">2</span>);
+                <span class="code-kw">float</span> dy = bullets[i].y - (boss-&gt;y + BOSS_HEIGHT / <span class="code-num">2</span>);
+
+                <span class="code-kw">if</span> (dx * dx + dy * dy &lt; BOSS_COLLISION_DIST * BOSS_COLLISION_DIST) {
+                    bullets[i].used = <span class="code-kw">false</span>;
+                    boss-&gt;hp--;
+
+                    <span class="code-kw">if</span> (boss-&gt;hp &lt;= <span class="code-num">0</span>) {
+                        boss-&gt;isAlive = <span class="code-kw">false</span>;
+                        g-&gt;score += <span class="code-num">1000</span>;
+                        g-&gt;game_over = <span class="code-kw">true</span>;
+                    }
+                }
+            }
+        }
+
+        <span class="code-cm">// enemy / boss가 쏜 총알</span>
+        <span class="code-kw">else</span> {
+            <span class="code-kw">if</span> (player-&gt;isInvincible) { <span class="code-cm">// 무적 상태면 continue</span>
+                <span class="code-kw">continue</span>;
+            }
+
+            <span class="code-kw">float</span> dx = bullets[i].x - (player-&gt;x + PLAYER_WIDE / <span class="code-num">2</span>);
+            <span class="code-kw">float</span> dy = bullets[i].y - (player-&gt;y + PLAYER_HEIGHT / <span class="code-num">2</span>);
+
+            <span class="code-kw">if</span> (dx * dx + dy * dy &lt; COLLISION_DIST * COLLISION_DIST) {
+                <span class="code-fn">Is_attacked</span>(g);
+                bullets[i].used = <span class="code-kw">false</span>;
+            }
+        }
+    }
+}`
+        },
+      ]
+    },
+    {
+      id: 'display',
+      icon: '🖥️',
+      name: 'Display',
+      desc: '화면 렌더링, UI 드로잉, 이미지·폰트 초기화 등 모든 시각 표현을 담당합니다. (Display.c)',
+      fns: [
+        {
+          name: 'mouse_on_button',
+          sig: 'bool mouse_on_button(float mx, float my, float bx, float by, float bw, float bh)',
+          brief: '마우스가 버튼 위에 있는지 확인',
+          desc: '마우스 좌표 <code>(mx, my)</code>가 버튼 사각형 안에 있으면 <code>true</code>를 반환합니다.',
+          params: [
+            { name: 'mx, my', type: 'float', desc: '현재 마우스 좌표.' },
+            { name: 'bx, by', type: 'float', desc: '버튼 좌상단 좌표.' },
+            { name: 'bw, bh', type: 'float', desc: '버튼 너비·높이.' },
+          ],
+          ret: 'bool',
+          example: `<span class="code-kw">if</span> (<span class="code-fn">mouse_on_button</span>(mx, my, btn.x, btn.y, btn.w, btn.h)) { }`,
+          fullcode: `<span class="code-kw">bool</span> <span class="code-fn">mouse_on_button</span>(<span class="code-kw">float</span> mx, <span class="code-kw">float</span> my, <span class="code-kw">float</span> bx, <span class="code-kw">float</span> by, <span class="code-kw">float</span> bw, <span class="code-kw">float</span> bh) {
+    <span class="code-kw">return</span> (mx &gt;= bx &amp;&amp; mx &lt;= bx + bw &amp;&amp; my &gt;= by &amp;&amp; my &lt;= by + bh);
+}`
+        },
+        {
+          name: 'draw_input_box',
+          sig: 'void draw_input_box(FONT* font, float x, float y, float w, float h, char* nickname)',
+          brief: '닉네임 입력창 렌더링',
+          desc: '닉네임이 비어있으면 회색 안내 텍스트, 입력 시 실제 닉네임을 렌더링합니다.',
+          params: [
+            { name: 'font', type: 'FONT*', desc: '사용할 폰트 구조체 포인터.' },
+            { name: 'x, y, w, h', type: 'float', desc: '입력창 위치·크기.' },
+            { name: 'nickname', type: 'char*', desc: '현재 입력된 닉네임.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_input_box</span>(&font, <span class="code-num">390</span>, <span class="code-num">300</span>, <span class="code-num">500</span>, <span class="code-num">60</span>, nickname);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_input_box</span>(<span class="code-type">FONT</span>* font, <span class="code-kw">float</span> x, <span class="code-kw">float</span> y, <span class="code-kw">float</span> w, <span class="code-kw">float</span> h, <span class="code-kw">char</span>* nickname) {
+    <span class="code-type">ALLEGRO_COLOR</span> text_color = <span class="code-fn">al_map_rgb</span>(<span class="code-num">20</span>, <span class="code-num">20</span>, <span class="code-num">20</span>);
+
+    <span class="code-cm">/* 닉네임이 없으면 안내 메시지, 있으면 실제 닉네임 출력 */</span>
+    <span class="code-kw">if</span> ((<span class="code-kw">int</span>)<span class="code-fn">strlen</span>(nickname) == <span class="code-num">0</span>) {
+        <span class="code-fn">al_draw_text</span>(font-&gt;font, <span class="code-fn">al_map_rgb</span>(<span class="code-num">120</span>, <span class="code-num">120</span>, <span class="code-num">120</span>), x + <span class="code-num">10</span>, y + <span class="code-num">15</span>, <span class="code-num">0</span>, <span class="code-str">&quot;Enter your nickname...&quot;</span>);
+    }
+    <span class="code-kw">else</span> {
+        <span class="code-fn">al_draw_text</span>(font-&gt;font, text_color, x + <span class="code-num">10</span>, y + <span class="code-num">15</span>, <span class="code-num">0</span>, nickname);
+    }
+}`
+        },
+        {
+          name: 'draw_hud_ui',
+          sig: 'void draw_hud_ui(FONT* font, char* nickname, IMAGE* i, GameState* g)',
+          brief: 'HUD UI 렌더링 (이름·시간·생명·점수)',
+          desc: '화면 좌상단에 플레이어 이름, 타이머, 생명력, 킬 점수를 렌더링합니다.',
+          params: [
+            { name: 'font', type: 'FONT*', desc: '폰트 구조체 포인터.' },
+            { name: 'nickname', type: 'char*', desc: '플레이어 닉네임.' },
+            { name: 'i', type: 'IMAGE*', desc: 'UI 아이콘 이미지 구조체.' },
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_hud_ui</span>(&font, nickname, &image, &game);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_hud_ui</span>(<span class="code-type">FONT</span>* font, <span class="code-kw">char</span>* nickname, <span class="code-type">IMAGE</span>* i, <span class="code-type">GameState</span>* g) {
+    <span class="code-kw">char</span> buffer[<span class="code-num">256</span>];
+    <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;Player name : %s&quot;</span>, nickname);
+    <span class="code-type">ALLEGRO_COLOR</span> text_color = <span class="code-fn">al_map_rgb</span>(<span class="code-num">255</span>, <span class="code-num">255</span>, <span class="code-num">255</span>);
+    <span class="code-fn">al_draw_text</span>(font-&gt;HUD, text_color, <span class="code-num">20</span>, <span class="code-num">20</span>, <span class="code-num">0</span>, buffer);
+    <span class="code-cm">// 시간</span>
+    <span class="code-fn">al_draw_bitmap</span>(i-&gt;clock, <span class="code-num">20</span>, <span class="code-num">40</span>, <span class="code-num">0</span>);
+    double time = g-&gt;time;
+    <span class="code-kw">int</span> minutes = ((<span class="code-kw">int</span>)time / <span class="code-num">60</span>) % <span class="code-num">60</span>;
+    <span class="code-kw">int</span> seconds = (<span class="code-kw">int</span>)time % <span class="code-num">60</span>;
+    <span class="code-kw">int</span> milliseconds = (<span class="code-kw">int</span>)((time - (<span class="code-kw">int</span>)time) * <span class="code-num">1000</span>) / <span class="code-num">10</span>;
+    <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot; %02d : %02d : %02d&quot;</span>, minutes, seconds, milliseconds);
+    <span class="code-fn">al_draw_text</span>(font-&gt;HUD, text_color, <span class="code-num">60</span>, <span class="code-num">45</span>, <span class="code-num">0</span>, buffer);
+    <span class="code-cm">// 목숨</span>
+    <span class="code-fn">al_draw_bitmap</span>(i-&gt;coin, <span class="code-num">20</span>, <span class="code-num">80</span>, <span class="code-num">0</span>);
+    <span class="code-fn">al_draw_text</span>(font-&gt;HUD, text_color, <span class="code-num">55</span>, <span class="code-num">85</span>, <span class="code-num">0</span>, <span class="code-str">&quot; : &quot;</span>);
+    <span class="code-kw">char</span> life_buffer[<span class="code-num">256</span>];
+    <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, g-&gt;player.life);
+    <span class="code-fn">al_draw_text</span>(font-&gt;HUD, <span class="code-fn">al_map_rgb</span>(<span class="code-num">255</span>, <span class="code-num">255</span> * (g-&gt;player.life) / MAX_LIFE, <span class="code-num">255</span> * (g-&gt;player.life) / MAX_LIFE), <span class="code-num">70</span>, <span class="code-num">85</span>, <span class="code-num">0</span>, buffer);
+
+    <span class="code-cm">// 점수</span>
+    <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot; KILL : %d&quot;</span>, g-&gt;score);
+    <span class="code-fn">al_draw_text</span>(font-&gt;HUD, text_color, <span class="code-num">100</span>, <span class="code-num">85</span>, <span class="code-num">0</span>, buffer);
+
+}`
+        },
+        {
+          name: 'append_char',
+          sig: 'void append_char(char* str, int max_len, char c)',
+          brief: '문자열 끝에 문자 추가',
+          desc: '현재 문자열 길이가 <code>max_len - 1</code> 미만일 때만 문자를 추가합니다.',
+          params: [
+            { name: 'str', type: 'char*', desc: '대상 문자열 버퍼.' },
+            { name: 'max_len', type: 'int', desc: '버퍼 최대 길이.' },
+            { name: 'c', type: 'char', desc: '추가할 문자.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">append_char</span>(nickname, MAX_NICKNAME, <span class="code-str">'A'</span>);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">append_char</span>(<span class="code-kw">char</span>* str, <span class="code-kw">int</span> max_len, <span class="code-kw">char</span> c) {
+    <span class="code-kw">int</span> len = (<span class="code-kw">int</span>)<span class="code-fn">strlen</span>(str);
+
+    <span class="code-cm">/* 현재 문자열 길이가 최대 허용 길이보다 작을 때만 문자 추가 */</span>
+    <span class="code-kw">if</span> (len &lt; max_len - <span class="code-num">1</span>) {
+        str[len] = c;         <span class="code-cm">// 새 문자 추가</span>
+        str[len + <span class="code-num">1</span>] = <span class="code-str">&#x27;\0&#x27;</span>;  <span class="code-cm">// 문자열 끝 표시</span>
+    }
+}`
+        },
+        {
+          name: 'draw_score_ui',
+          sig: 'void draw_score_ui(FONT* font, IMAGE* i)',
+          brief: '랭킹 화면 렌더링',
+          desc: '스코어 페이지 배경을 출력하고 <code>ranking.txt</code>에서 닉네임·점수·시간 10개를 읽어 표시합니다.',
+          params: [
+            { name: 'font', type: 'FONT*', desc: '폰트 구조체 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '배경 이미지 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_score_ui</span>(&font, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_score_ui</span>(<span class="code-type">FONT</span>* font, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-fn">al_draw_scaled_bitmap</span>(
+        i-&gt;score_page,
+        <span class="code-num">0</span>, <span class="code-num">0</span>,
+        <span class="code-fn">al_get_bitmap_width</span>(i-&gt;score_page),
+        <span class="code-fn">al_get_bitmap_height</span>(i-&gt;score_page),
+        <span class="code-num">0</span>, <span class="code-num">0</span>,
+        SCREEN_W,
+        SCREEN_H,
+        <span class="code-num">0</span>
+    );
+    <span class="code-type">ALLEGRO_COLOR</span> text_color = <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>);
+    <span class="code-type">scores</span> l[<span class="code-num">10</span>];
+    (<span class="code-kw">void</span>)<span class="code-fn">freopen</span>(<span class="code-str">&quot;ranking.txt&quot;</span>, <span class="code-str">&quot;r&quot;</span>, stdin);  <span class="code-cm">// 읽기 모드</span>
+    <span class="code-kw">char</span> buffer[<span class="code-num">256</span>];
+    <span class="code-cm">// 파일에서 데이터 읽기</span>
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%s&quot;</span>, l[i].nickname);
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%s&quot;</span>, (<span class="code-kw">char</span>*)l[i].nickname);
+        <span class="code-fn">al_draw_text</span>(font-&gt;font, text_color, <span class="code-num">425</span>, <span class="code-num">250</span> + i * <span class="code-num">33</span>, <span class="code-num">0</span>, buffer);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; <span class="code-num">10</span>; j++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;l[j].score);
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, l[j].score);
+        <span class="code-fn">al_draw_text</span>(font-&gt;font, text_color, <span class="code-num">675</span>, <span class="code-num">250</span> + j * <span class="code-num">33</span>, <span class="code-num">0</span>, buffer);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> k = <span class="code-num">0</span>; k &lt; <span class="code-num">10</span>; k++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;l[k].time);
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, l[k].time);
+        <span class="code-fn">al_draw_text</span>(font-&gt;font, text_color, <span class="code-num">825</span>, <span class="code-num">250</span> + k * <span class="code-num">33</span>, <span class="code-num">0</span>, buffer);
+    }
+}`
+        },
+        {
+          name: 'scores_setting',
+          sig: 'scores* scores_setting(void)',
+          brief: 'ranking.txt에서 점수 목록 동적 로드',
+          desc: '<code>scores</code> 10개를 동적 할당하고 파일을 읽어 채웁니다. 사용 후 <code>free()</code> 필요.',
+          params: [],
+          ret: 'scores* — 동적 할당된 랭킹 배열 (실패 시 NULL)',
+          example: `<span class="code-type">scores</span>* list = <span class="code-fn">scores_setting</span>();
+<span class="code-fn">free</span>(list);`,
+          fullcode: `<span class="code-type">scores</span>* <span class="code-fn">scores_setting</span>() {
+    <span class="code-type">scores</span>* list = (<span class="code-type">scores</span>*)<span class="code-fn">calloc</span>(<span class="code-num">10</span>, <span class="code-fn">sizeof</span>(<span class="code-type">scores</span>));
+    <span class="code-kw">if</span> (list == <span class="code-kw">NULL</span>) {
+        <span class="code-kw">return</span> <span class="code-kw">NULL</span>;
+    }
+    (<span class="code-kw">void</span>)<span class="code-fn">freopen</span>(<span class="code-str">&quot;ranking.txt&quot;</span>, <span class="code-str">&quot;r&quot;</span>, stdin);
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%s&quot;</span>, list[i].nickname);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;list[i].score);
+    }
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt; <span class="code-num">10</span>; i++) {
+        (<span class="code-kw">void</span>)<span class="code-fn">scanf</span>(<span class="code-str">&quot;%d&quot;</span>, &amp;list[i].time);
+    }
+
+    <span class="code-kw">return</span> list;
+}`
+        },
+        {
+          name: 'draw_stage',
+          sig: 'void draw_stage(GameState* g, IMAGE* i)',
+          brief: '현재 스테이지 배경 비트맵 출력',
+          desc: '<code>g->level</code>에 따라 STAGE1~3 또는 BOSS 배경을 전체 화면으로 스케일하여 출력합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '배경 비트맵 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_stage</span>(&game, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_stage</span>(<span class="code-type">GameState</span>* g, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-kw">switch</span> (g-&gt;level) {
+    <span class="code-kw">case</span> STAGE1:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;background_stage_1,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;background_stage_1),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;background_stage_1),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> STAGE2:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;background_stage_2,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;background_stage_2),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;background_stage_2),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> STAGE3:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;background_stage_3,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;background_stage_3),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;background_stage_3),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; MAX_OBJECTS; j++) {
+            <span class="code-fn">al_draw_filled_rectangle</span>(g-&gt;stage_map.objects[j].x, g-&gt;stage_map.objects[j].y,
+                g-&gt;stage_map.objects[j].x + g-&gt;stage_map.objects[j].w, g-&gt;stage_map.objects[j].y + g-&gt;stage_map.objects[j].h,
+                <span class="code-fn">al_map_rgb</span>(<span class="code-num">255</span>, <span class="code-num">0</span>, <span class="code-num">0</span>));
+        }
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> BOSS:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;background_stage_boss,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;background_stage_boss),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;background_stage_boss),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+
+        <span class="code-kw">break</span>;
+    }
+}`
+        },
+        {
+          name: 'draw_action',
+          sig: 'void draw_action(GameState* g, IMAGE* i)',
+          brief: '플레이어 스프라이트 렌더링',
+          desc: '무적 깜빡임, 점프 여부, 이동 방향에 따라 4종 걷기·점프 스프라이트를 출력합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '플레이어 스프라이트 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_action</span>(&game, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_action</span>(<span class="code-type">GameState</span>* g, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-kw">float</span> player_x = g-&gt;player.x;
+    <span class="code-kw">float</span> player_y = g-&gt;player.y;
+    <span class="code-kw">if</span> (((g-&gt;player.invincibleTime / <span class="code-num">2</span>) % <span class="code-num">3</span>) == <span class="code-num">1</span>)<span class="code-kw">return</span>;
+
+    <span class="code-kw">if</span> (g-&gt;player.isJumping) {
+        <span class="code-kw">if</span> (g-&gt;player.facingRight) <span class="code-fn">al_draw_bitmap</span>(i-&gt;right_jumping, player_x, player_y, <span class="code-num">0</span>);
+        <span class="code-kw">else</span> <span class="code-fn">al_draw_bitmap</span>(i-&gt;left_jumping, player_x, player_y, <span class="code-num">0</span>);
+    }
+    <span class="code-kw">else</span> {
+        <span class="code-kw">if</span> (g-&gt;player.facingRight == <span class="code-kw">true</span>) {
+            <span class="code-kw">if</span> ((<span class="code-kw">int</span>)player_x % <span class="code-num">44</span> &lt;= <span class="code-num">22</span>) {
+                <span class="code-fn">al_draw_bitmap</span>(i-&gt;right_walking_1, player_x, player_y, <span class="code-num">0</span>);
+            }
+            <span class="code-kw">else</span> {
+                <span class="code-fn">al_draw_bitmap</span>(i-&gt;right_walking_2, player_x, player_y, <span class="code-num">0</span>);
+            }
+        }
+        <span class="code-kw">else</span> {
+            <span class="code-kw">if</span> ((<span class="code-kw">int</span>)player_x % <span class="code-num">44</span> &lt;= <span class="code-num">22</span>) {
+                <span class="code-fn">al_draw_bitmap</span>(i-&gt;left_walking_1, player_x, player_y, <span class="code-num">0</span>);
+            }
+            <span class="code-kw">else</span> {
+                <span class="code-fn">al_draw_bitmap</span>(i-&gt;left_walking_2, player_x, player_y, <span class="code-num">0</span>);
+            }
+        }
+    }
+}`
+        },
+        {
+          name: 'Init_image',
+          sig: 'void Init_image(IMAGE* i)',
+          brief: '게임 내 모든 이미지 비트맵 로드',
+          desc: '화면 5종, 배경 4종, 플레이어 스프라이트 6종, UI 아이콘 2종, 적 스프라이트 7종을 로드합니다.',
+          params: [{ name: 'i', type: 'IMAGE*', desc: '비트맵 저장 구조체 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_image</span>(&image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_image</span>(<span class="code-type">IMAGE</span>* i) {
+    i-&gt;main_page = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;start_page.png&quot;</span>);
+    i-&gt;score_page = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;score_page.png&quot;</span>);
+    i-&gt;change_page = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;change_page.png&quot;</span>);
+    i-&gt;gameover_page = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;gameover_page.png&quot;</span>);
+    i-&gt;gameclear_page = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;gameclear_page.png&quot;</span>);
+
+    i-&gt;background_stage_1 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;map_1.png&quot;</span>);
+    i-&gt;background_stage_2 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;map_2.png&quot;</span>);
+    i-&gt;background_stage_3 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;map_3.png&quot;</span>);
+    i-&gt;background_stage_boss = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;map_4.png&quot;</span>);
+
+    i-&gt;right_walking_1 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;right_main_walk_1.png&quot;</span>);
+    i-&gt;right_walking_2 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;right_main_walk2.png&quot;</span>);
+    i-&gt;left_walking_1 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;left_main_walk_1.png&quot;</span>);
+    i-&gt;left_walking_2 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;left_main_walk_2.png&quot;</span>);
+    i-&gt;left_jumping = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;left_main_jump.png&quot;</span>);
+    i-&gt;right_jumping = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;right_main_jump.png&quot;</span>);
+
+    i-&gt;clock = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;clock.png&quot;</span>);
+    i-&gt;coin = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;hp.png&quot;</span>);
+
+    i-&gt;easy_enemy = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;easy_enemy.png&quot;</span>);
+    i-&gt;easy_enemy_2 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;easy_enemy_2.png&quot;</span>);
+    i-&gt;hard_enemy = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;hard_enemy.png&quot;</span>);
+    i-&gt;easy_enemy_right = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;easy_enemy_right.png&quot;</span>);
+    i-&gt;easy_enemy_right_2 = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;easy_enemy_right_2.png&quot;</span>);
+    i-&gt;hard_enemy_right = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;hard_enemy_right.png&quot;</span>);
+    i-&gt;boss_enemy = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;BOSS.png&quot;</span>);
+
+    i-&gt;paper = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;paper.png&quot;</span>);
+    i-&gt;heart = <span class="code-fn">al_load_bitmap</span>(<span class="code-str">&quot;heart.png&quot;</span>);
+}`
+        },
+        {
+          name: 'Init_font',
+          sig: 'void Init_font(FONT* f)',
+          brief: '게임 내 폰트 로드',
+          desc: '기본 내장 폰트, Arial 20pt HUD 폰트, Arial 40pt 타이틀 폰트를 로드합니다.',
+          params: [{ name: 'f', type: 'FONT*', desc: '폰트 저장 구조체 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-fn">Init_font</span>(&font);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_font</span>(<span class="code-type">FONT</span>* f) {
+    f-&gt;font = <span class="code-fn">al_create_builtin_font</span>();
+    f-&gt;HUD = <span class="code-fn">al_load_ttf_font</span>(<span class="code-str">&quot;C:/Windows/Fonts/Arial.ttf&quot;</span>, <span class="code-num">20</span>, <span class="code-num">0</span>);
+    f-&gt;font_title = <span class="code-fn">al_load_ttf_font</span>(<span class="code-str">&quot;C:/Windows/Fonts/Arial.ttf&quot;</span>, <span class="code-num">40</span>, <span class="code-num">0</span>);
+}`
+        },
+        {
+          name: 'draw_heart_paper',
+          sig: 'void draw_heart_paper(GameState* g, IMAGE* i)',
+          brief: '총알 비트맵 렌더링 (하트 / 종이)',
+          desc: '플레이어 총알은 하트 이미지, 적·보스 총알은 종이(paper) 이미지를 그립니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '총알 비트맵 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_heart_paper</span>(&game, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_heart_paper</span>(<span class="code-type">GameState</span>* g, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-type">Bullet</span>* bullets = g-&gt;bullets;
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; MAX_BULLETS; j++) {
+        <span class="code-kw">if</span> (!bullets[j].used) {
+            <span class="code-kw">continue</span>;
+        }
+        <span class="code-kw">if</span> (bullets[j].player == <span class="code-kw">true</span>) {
+            <span class="code-fn">al_draw_bitmap</span>(i-&gt;heart, bullets[j].x, bullets[j].y, <span class="code-num">0</span>);
+        }
+        <span class="code-kw">else</span> <span class="code-kw">if</span> (bullets[j].player == <span class="code-kw">false</span>) {
+            <span class="code-fn">al_draw_bitmap</span>(i-&gt;paper, bullets[j].x, bullets[j].y, <span class="code-num">0</span>);
+        }
+    }
+}`
+        },
+        {
+          name: 'draw_enemy',
+          sig: 'void draw_enemy(GameState* g, IMAGE* i)',
+          brief: '모든 적 및 보스 렌더링',
+          desc: '보스가 살아있으면 HP 바와 보스 스프라이트를, 각 적은 타입·방향·애니메이션에 맞는 스프라이트를 출력합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '적·보스 스프라이트 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_enemy</span>(&game, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_enemy</span>(<span class="code-type">GameState</span>* g, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-type">Enemy_manage</span>* enemies = &amp;(g-&gt;enemies);
+    <span class="code-type">Boss</span>* boss = &amp;(g-&gt;boss);
+
+    <span class="code-kw">if</span> (boss-&gt;isAlive == <span class="code-num">1</span>) {
+        <span class="code-fn">draw_boss_hp</span>(g);
+        <span class="code-fn">al_draw_bitmap</span>(i-&gt;boss_enemy, boss-&gt;x, boss-&gt;y, <span class="code-num">0</span>);
+    }
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> j = <span class="code-num">0</span>; j &lt; enemies-&gt;now_enemy; j++)
+    {
+        <span class="code-kw">if</span> (!enemies-&gt;enemy[j].isAlive)
+            <span class="code-kw">continue</span>;
+        <span class="code-kw">if</span> (!enemies-&gt;enemy[j].use)
+            <span class="code-kw">continue</span>;
+        <span class="code-kw">if</span> (enemies-&gt;enemy[j].type == <span class="code-num">0</span>) {<span class="code-cm">// 근접일 경우</span>
+            <span class="code-kw">if</span> (enemies-&gt;enemy[j].facingRight == <span class="code-kw">true</span>) {
+                <span class="code-kw">if</span> ((<span class="code-kw">int</span>)(enemies-&gt;enemy[j].x) % <span class="code-num">44</span> &lt;= <span class="code-num">22</span>) {
+                    <span class="code-fn">al_draw_bitmap</span>(i-&gt;easy_enemy_right_2, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+                }
+                <span class="code-kw">else</span> {
+                    <span class="code-fn">al_draw_bitmap</span>(i-&gt;easy_enemy_right, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+                }
+            }
+            <span class="code-kw">else</span> {
+                <span class="code-kw">if</span> ((<span class="code-kw">int</span>)(enemies-&gt;enemy[j].x) % <span class="code-num">44</span> &lt;= <span class="code-num">22</span>) {
+                    <span class="code-fn">al_draw_bitmap</span>(i-&gt;easy_enemy_2, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+                }
+                <span class="code-kw">else</span> {
+                    <span class="code-fn">al_draw_bitmap</span>(i-&gt;easy_enemy, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+                }
+            }
+        }
+        <span class="code-kw">else</span> <span class="code-kw">if</span> (enemies-&gt;enemy[j].type == <span class="code-num">1</span>) {
+            {
+                <span class="code-kw">if</span> (enemies-&gt;enemy[j].x &lt; g-&gt;player.x) {
+                    <span class="code-fn">al_draw_bitmap</span>(i-&gt;hard_enemy_right, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+                }
+                <span class="code-kw">else</span> <span class="code-fn">al_draw_bitmap</span>(i-&gt;hard_enemy, enemies-&gt;enemy[j].x, enemies-&gt;enemy[j].y, <span class="code-num">0</span>);
+            }
+
+        }
+    }
+}`
+        },
+        {
+          name: 'Update_scene',
+          sig: 'void Update_scene(GameState* g, Scene* scene)',
+          brief: '씬 전환 프레임 카운터 처리',
+          desc: '레벨 <code>OVER</code>면 즉시 <code>SCENE_OVER</code>로 전환, 그 외 70프레임 후 <code>SCENE_GAME</code>으로 복귀합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'scene', type: 'Scene*', desc: '현재 씬 포인터.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">Update_scene</span>(&game, &scene);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Update_scene</span>(<span class="code-type">GameState</span>* g, <span class="code-type">Scene</span>* scene) {
+    <span class="code-kw">if</span> (g-&gt;level == OVER) {
+        *scene = SCENE_OVER;
+    }
+    g-&gt;frame += <span class="code-num">1</span>;
+    <span class="code-kw">if</span> (g-&gt;frame &gt; <span class="code-num">70</span>) {
+        g-&gt;frame = <span class="code-num">0</span>;
+        *scene = SCENE_GAME;
+    }
+}`
+        },
+        {
+          name: 'draw_scene_change',
+          sig: 'void draw_scene_change(GameState* g, FONT* f, Scene* scene, IMAGE* i)',
+          brief: '스테이지 전환 화면 렌더링',
+          desc: '전환 배경 위에 스테이지 번호("2", "3") 또는 "BOSS" 텍스트를 화면 중앙에 출력합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'f', type: 'FONT*', desc: '타이틀 폰트 구조체.' },
+            { name: 'scene', type: 'Scene*', desc: '현재 씬 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '배경 비트맵 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_scene_change</span>(&game, &font, &scene, &image);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_scene_change</span>(<span class="code-type">GameState</span>* g, <span class="code-type">FONT</span>* f, <span class="code-type">Scene</span>* scene, <span class="code-type">IMAGE</span>* i) {
+    <span class="code-kw">switch</span> (g-&gt;level) {
+    <span class="code-kw">case</span> STAGE1:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;change_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;change_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;change_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">al_draw_text</span>(f-&gt;font_title, <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>), SCREEN_W / <span class="code-num">2</span>, <span class="code-num">323</span>,
+            ALLEGRO_ALIGN_CENTER, <span class="code-str">&quot;1&quot;</span>);
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> STAGE2:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;change_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;change_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;change_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">al_draw_text</span>(f-&gt;font_title, <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>), SCREEN_W / <span class="code-num">2</span>, <span class="code-num">323</span>,
+            ALLEGRO_ALIGN_CENTER, <span class="code-str">&quot;2&quot;</span>);
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> STAGE3:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;change_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;change_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;change_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">al_draw_text</span>(f-&gt;font_title, <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>), SCREEN_W / <span class="code-num">2</span>, <span class="code-num">323</span>,
+            ALLEGRO_ALIGN_CENTER, <span class="code-str">&quot;3&quot;</span>);
+        <span class="code-kw">break</span>;
+    <span class="code-kw">case</span> BOSS:
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;change_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;change_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;change_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">al_draw_text</span>(f-&gt;font_title, <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>), SCREEN_W / <span class="code-num">2</span>, <span class="code-num">323</span>,
+            ALLEGRO_ALIGN_CENTER, <span class="code-str">&quot;BOSS&quot;</span>);
+        <span class="code-kw">break</span>;
+    }
+
+}`
+        },
+        {
+          name: 'draw_over',
+          sig: 'void draw_over(GameState* g, IMAGE* i, FONT* f)',
+          brief: '게임오버 또는 게임클리어 화면 렌더링',
+          desc: '보스 HP가 0이면 게임클리어, 그 외 게임오버 배경을 출력하고 점수·시간을 표시합니다.',
+          params: [
+            { name: 'g', type: 'GameState*', desc: '현재 게임 상태 포인터.' },
+            { name: 'i', type: 'IMAGE*', desc: '배경 이미지 구조체.' },
+            { name: 'f', type: 'FONT*', desc: '점수 표시 폰트 구조체.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-fn">draw_over</span>(&game, &image, &font);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_over</span>(<span class="code-type">GameState</span>* g, <span class="code-type">IMAGE</span>* i, <span class="code-type">FONT</span>* f) {
+    <span class="code-type">ALLEGRO_COLOR</span> text_color = <span class="code-fn">al_map_rgb</span>(<span class="code-num">0</span>, <span class="code-num">0</span>, <span class="code-num">0</span>);
+    <span class="code-kw">char</span> buffer[<span class="code-num">256</span>];
+
+    <span class="code-kw">if</span> (g-&gt;level == BOSS &amp;&amp; g-&gt;boss.hp == <span class="code-num">0</span>) {
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;gameclear_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;gameclear_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;gameclear_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, g-&gt;score);
+        <span class="code-fn">al_draw_text</span>(f-&gt;font, text_color, <span class="code-num">523</span>, <span class="code-num">531</span>, <span class="code-num">0</span>, buffer);
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, ((<span class="code-kw">int</span>)(g-&gt;time)));
+        <span class="code-fn">al_draw_text</span>(f-&gt;font, text_color, <span class="code-num">761</span>, <span class="code-num">531</span>, <span class="code-num">0</span>, buffer);
+    }
+    <span class="code-kw">else</span> {
+        <span class="code-fn">al_draw_scaled_bitmap</span>(
+            i-&gt;gameover_page,
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            <span class="code-fn">al_get_bitmap_width</span>(i-&gt;gameover_page),
+            <span class="code-fn">al_get_bitmap_height</span>(i-&gt;gameover_page),
+            <span class="code-num">0</span>, <span class="code-num">0</span>,
+            SCREEN_W,
+            SCREEN_H,
+            <span class="code-num">0</span>
+        );
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, g-&gt;score);
+        <span class="code-fn">al_draw_text</span>(f-&gt;font, text_color, <span class="code-num">523</span>, <span class="code-num">531</span>, <span class="code-num">0</span>, buffer);
+        <span class="code-fn">snprintf</span>(buffer, <span class="code-fn">sizeof</span>(buffer), <span class="code-str">&quot;%d&quot;</span>, ((<span class="code-kw">int</span>)(g-&gt;time)));
+        <span class="code-fn">al_draw_text</span>(f-&gt;font, text_color, <span class="code-num">761</span>, <span class="code-num">531</span>, <span class="code-num">0</span>, buffer);
+    }
+
+}`
+        },
+        {
+          name: 'draw_boss_hp',
+          sig: 'void draw_boss_hp(GameState* g)',
+          brief: '보스 HP 바 렌더링',
+          desc: '보스 위쪽에 회색 배경→흰색 외곽→빨간 HP 바를 순서대로 그립니다. 최대 너비 185px, <code>BOSS_HP</code> 비율로 계산합니다.',
+          params: [{ name: 'g', type: 'GameState*', desc: '보스 HP 정보가 담긴 게임 상태 포인터.' }],
+          ret: 'void',
+          example: `<span class="code-cm">// draw_enemy()에서 자동 호출</span>
+<span class="code-fn">draw_boss_hp</span>(g);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">draw_boss_hp</span>(<span class="code-type">GameState</span>* g) {
+    <span class="code-fn">al_draw_filled_rectangle</span>(g-&gt;boss.x, g-&gt;boss.y - <span class="code-num">30</span>, g-&gt;boss.x + BOSS_WEIGHT, g-&gt;boss.y - <span class="code-num">30</span> - <span class="code-num">50</span>, <span class="code-fn">al_map_rgb</span>(<span class="code-num">128</span>, <span class="code-num">128</span>, <span class="code-num">128</span>));
+    <span class="code-fn">al_draw_filled_rectangle</span>(g-&gt;boss.x + <span class="code-num">10</span>, g-&gt;boss.y - <span class="code-num">40</span>, g-&gt;boss.x + <span class="code-num">10</span> + <span class="code-num">185</span>, g-&gt;boss.y - <span class="code-num">40</span> - <span class="code-num">30</span>, <span class="code-fn">al_map_rgb</span>(<span class="code-num">255</span>, <span class="code-num">255</span>, <span class="code-num">255</span>));
+    <span class="code-fn">al_draw_filled_rectangle</span>(g-&gt;boss.x + <span class="code-num">10</span>, g-&gt;boss.y - <span class="code-num">40</span>, g-&gt;boss.x + <span class="code-num">10</span> + (<span class="code-kw">int</span>)(<span class="code-num">185</span> * (g-&gt;boss.hp) / BOSS_HP), g-&gt;boss.y - <span class="code-num">40</span> - <span class="code-num">30</span>, <span class="code-fn">al_map_rgb</span>(<span class="code-num">255</span>, <span class="code-num">0</span>, <span class="code-num">0</span>));
+}`
+        },
+      ]
+    },
+    {
+      id: 'audio',
+      icon: '🎵',
+      name: 'Audio',
+      desc: '사운드 이펙트·BGM 로드·재생·정리를 담당합니다. Allegro5 오디오 애드온을 사용하며 샘플 9종과 스트림 5종을 관리합니다. (audio.c / audio.h)',
+      fns: [
+        {
+          name: 'must_init',
+          sig: 'void must_init(bool test, const char* description)',
+          brief: '초기화 결과 검증 헬퍼',
+          desc: '<code>test</code>가 <code>false</code>이면 description을 포함한 오류 메시지를 출력하고 <code>exit(1)</code>로 즉시 종료합니다. 오디오 리소스 로드 직후마다 호출하여 누락된 파일을 빠르게 감지합니다.',
+          params: [
+            { name: 'test', type: 'bool', desc: '초기화 성공 여부 (true = 성공, false = 실패).' },
+            { name: 'description', type: 'const char*', desc: '실패 시 출력할 리소스 이름 문자열.' },
+          ],
+          ret: 'void',
+          example: `<span class="code-type">ALLEGRO_SAMPLE</span>* snd = <span class="code-fn">al_load_sample</span>(<span class="code-str">"jump.wav"</span>);
+<span class="code-fn">must_init</span>(snd, <span class="code-str">"jump sound"</span>);`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">must_init</span>(<span class="code-kw">bool</span> test, <span class="code-kw">const</span> <span class="code-kw">char</span>* description)
+{
+    <span class="code-kw">if</span> (test) <span class="code-kw">return</span>;
+    <span class="code-fn">printf</span>(<span class="code-str">"couldn't initialize %s\n"</span>, description);
+    <span class="code-fn">exit</span>(<span class="code-num">1</span>);
+}`
+        },
+        {
+          name: 'Init_audio',
+          sig: 'void Init_audio(void)',
+          brief: '오디오 시스템 및 모든 리소스 초기화',
+          desc: 'Allegro 오디오·코덱 애드온을 설치하고 최대 128개 샘플 슬롯을 예약합니다. 이후 효과음 9종(<code>sound_jump</code>, <code>sound_step</code>, <code>sound_attacked</code>, <code>sound_heart</code>, <code>sound_paper</code>, <code>sound_enemyattacked</code>, <code>sound_gameover</code>, <code>sound_gameclear</code>, <code>sound_trans</code>)과 BGM 스트림 5종(<code>basic_bgm</code>, <code>stage_bgm[0~3]</code>)을 로드합니다. 모든 스트림은 기본 믹서에 연결되고 루프 모드로 설정됩니다. 로드 실패 시 <code>must_init()</code>이 즉시 종료합니다.',
+          params: [],
+          ret: 'void',
+          example: `<span class="code-cm">// main() 초기화 구간에서 한 번만 호출</span>
+<span class="code-fn">Init_audio</span>();`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">Init_audio</span>()
+{
+    <span class="code-fn">al_install_audio</span>();
+    <span class="code-fn">al_init_acodec_addon</span>();
+    <span class="code-fn">al_reserve_samples</span>(<span class="code-num">128</span>);
+
+    sound_jump = <span class="code-fn">al_load_sample</span>(<span class="code-str">"jump.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_jump, <span class="code-str">"jump sound"</span>);
+
+    sound_step = <span class="code-fn">al_load_sample</span>(<span class="code-str">"step.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_step, <span class="code-str">"step sound"</span>);
+
+    sound_attacked = <span class="code-fn">al_load_sample</span>(<span class="code-str">"attacked.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_attacked, <span class="code-str">"attacked sound"</span>);
+
+    sound_heart = <span class="code-fn">al_load_sample</span>(<span class="code-str">"heart.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_heart, <span class="code-str">"heart sound"</span>);
+
+    sound_paper = <span class="code-fn">al_load_sample</span>(<span class="code-str">"paper.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_paper, <span class="code-str">"paper sound"</span>);
+
+    sound_enemyattacked = <span class="code-fn">al_load_sample</span>(<span class="code-str">"enemy_attacked.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_enemyattacked, <span class="code-str">"enemy attacked sound"</span>);
+
+    sound_gameover = <span class="code-fn">al_load_sample</span>(<span class="code-str">"gameover.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_gameover, <span class="code-str">"gameover sound"</span>);
+
+    sound_gameclear = <span class="code-fn">al_load_sample</span>(<span class="code-str">"gameclear.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_gameclear, <span class="code-str">"gameclear sound"</span>);
+
+    sound_trans = <span class="code-fn">al_load_sample</span>(<span class="code-str">"trans.wav"</span>);
+    <span class="code-fn">must_init</span>(sound_trans, <span class="code-str">"transition sound"</span>);
+
+    basic_bgm = <span class="code-fn">al_load_audio_stream</span>(<span class="code-str">"basic_bgm.mp3"</span>, <span class="code-num">4</span>, <span class="code-num">2048</span>);
+    <span class="code-fn">must_init</span>(basic_bgm, <span class="code-str">"basic bgm"</span>);
+
+    stage_bgm[<span class="code-num">0</span>] = <span class="code-fn">al_load_audio_stream</span>(<span class="code-str">"stage1_bgm.mp3"</span>, <span class="code-num">4</span>, <span class="code-num">2048</span>);
+    <span class="code-fn">must_init</span>(stage_bgm[<span class="code-num">0</span>], <span class="code-str">"stage1 bgm"</span>);
+
+    stage_bgm[<span class="code-num">1</span>] = <span class="code-fn">al_load_audio_stream</span>(<span class="code-str">"stage2_bgm.mp3"</span>, <span class="code-num">4</span>, <span class="code-num">2048</span>);
+    <span class="code-fn">must_init</span>(stage_bgm[<span class="code-num">1</span>], <span class="code-str">"stage2 bgm"</span>);
+
+    stage_bgm[<span class="code-num">2</span>] = <span class="code-fn">al_load_audio_stream</span>(<span class="code-str">"stage3_bgm.mp3"</span>, <span class="code-num">4</span>, <span class="code-num">2048</span>);
+    <span class="code-fn">must_init</span>(stage_bgm[<span class="code-num">2</span>], <span class="code-str">"stage3 bgm"</span>);
+
+    stage_bgm[<span class="code-num">3</span>] = <span class="code-fn">al_load_audio_stream</span>(<span class="code-str">"stage4_bgm.mp3"</span>, <span class="code-num">4</span>, <span class="code-num">2048</span>);
+    <span class="code-fn">must_init</span>(stage_bgm[<span class="code-num">3</span>], <span class="code-str">"stage4 bgm"</span>);
+
+    <span class="code-fn">al_attach_audio_stream_to_mixer</span>(basic_bgm, <span class="code-fn">al_get_default_mixer</span>());
+    <span class="code-fn">al_set_audio_stream_playmode</span>(basic_bgm, ALLEGRO_PLAYMODE_LOOP);
+    <span class="code-fn">al_set_audio_stream_playing</span>(basic_bgm, <span class="code-kw">false</span>);
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt;= <span class="code-num">3</span>; i++) {
+        <span class="code-fn">al_attach_audio_stream_to_mixer</span>(stage_bgm[i], <span class="code-fn">al_get_default_mixer</span>());
+        <span class="code-fn">al_set_audio_stream_playmode</span>(stage_bgm[i], ALLEGRO_PLAYMODE_LOOP);
+        <span class="code-fn">al_set_audio_stream_playing</span>(stage_bgm[i], <span class="code-kw">false</span>);
+    }
+}`
+        },
+        {
+          name: 'audio_deinit',
+          sig: 'void audio_deinit(void)',
+          brief: '오디오 리소스 전체 해제',
+          desc: '로드된 효과음 샘플 9종을 <code>al_destroy_sample()</code>로 해제하고, BGM 스트림 5종(<code>basic_bgm</code>, <code>stage_bgm[0~3]</code>)을 NULL 검사 후 <code>al_destroy_audio_stream()</code>으로 해제합니다. 프로그램 종료 직전 <code>main()</code>에서 호출합니다.',
+          params: [],
+          ret: 'void',
+          example: `<span class="code-cm">// main() 종료 직전 정리</span>
+<span class="code-fn">audio_deinit</span>();`,
+          fullcode: `<span class="code-kw">void</span> <span class="code-fn">audio_deinit</span>()
+{
+    <span class="code-fn">al_destroy_sample</span>(sound_jump);
+    <span class="code-fn">al_destroy_sample</span>(sound_step);
+    <span class="code-fn">al_destroy_sample</span>(sound_attacked);
+    <span class="code-fn">al_destroy_sample</span>(sound_heart);
+    <span class="code-fn">al_destroy_sample</span>(sound_paper);
+    <span class="code-fn">al_destroy_sample</span>(sound_enemyattacked);
+    <span class="code-fn">al_destroy_sample</span>(sound_gameover);
+    <span class="code-fn">al_destroy_sample</span>(sound_gameclear);
+    <span class="code-fn">al_destroy_sample</span>(sound_trans);
+
+    <span class="code-kw">for</span> (<span class="code-kw">int</span> i = <span class="code-num">0</span>; i &lt;= <span class="code-num">3</span>; i++) {
+        <span class="code-kw">if</span> (stage_bgm[i] != <span class="code-kw">NULL</span>) {
+            <span class="code-fn">al_destroy_audio_stream</span>(stage_bgm[i]);
+        }
+    }
+
+    <span class="code-kw">if</span> (basic_bgm != <span class="code-kw">NULL</span>) {
+        <span class="code-fn">al_destroy_audio_stream</span>(basic_bgm);
+    }
+}`
+        },
+      ]
+    },
+  ]
+};
+
+// FLAT INDEX
+const fnIndex = [];
+API.groups.forEach(g => g.fns.forEach(f => fnIndex.push({ ...f, group: g.name, groupId: g.id })));
+
+// RENDER CARDS
+const grid = document.getElementById('cardsGrid');
+API.groups.forEach(g => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="card-icon">${g.icon}</span>
+    <span class="card-count">${g.fns.length} fn</span>
+    <div class="card-name">${g.name}</div>
+    <div class="card-desc">${g.desc}</div>
+  `;
+  card.addEventListener('click', () => openModal(g));
+  grid.appendChild(card);
+});
+
+// MODAL
+const overlay    = document.getElementById('modalOverlay');
+const modalIcon  = document.getElementById('modalIcon');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc  = document.getElementById('modalDesc');
+const fnList     = document.getElementById('fnList');
+const modalClose = document.getElementById('modalClose');
+
+function buildFnItem(fn) {
+  const item = document.createElement('div');
+  item.className = 'fn-item';
+  const trigger = document.createElement('button');
+  trigger.className = 'fn-trigger';
+  trigger.innerHTML = `<span class="fn-name">${fn.name}()</span><span class="fn-brief">${fn.brief}</span><span class="fn-chevron">▶</span>`;
+  const detail = document.createElement('div');
+  detail.className = 'fn-detail';
+  detail.innerHTML = buildDetail(fn);
+  trigger.addEventListener('click', () => {
+    const open = detail.classList.contains('open');
+    fnList.querySelectorAll('.fn-detail').forEach(d => d.classList.remove('open'));
+    fnList.querySelectorAll('.fn-trigger').forEach(t => t.classList.remove('active'));
+    if (!open) { detail.classList.add('open'); trigger.classList.add('active'); }
+  });
+  item.appendChild(trigger);
+  item.appendChild(detail);
+  return item;
+}
+
+function buildDetail(fn) {
+  const paramRows = fn.params.length
+    ? fn.params.map(p => `<tr><td class="param-name">${p.name}</td><td class="param-type">${p.type}</td><td class="detail-text">${p.desc}</td></tr>`).join('')
+    : `<tr><td colspan="3" style="color:var(--muted);font-size:12px;padding:8px 12px;">없음</td></tr>`;
+  return `
+    <div class="detail-section"><div class="detail-label">시그니처</div><div class="code-block"><span class="code-fn">${fn.sig}</span></div></div>
+    <div class="detail-section"><div class="detail-label">동작 설명</div><div class="detail-text">${fn.desc}</div></div>
+    <div class="detail-section"><div class="detail-label">Parameters</div>
+      <table class="param-table"><thead><tr><th>이름</th><th>타입</th><th>설명</th></tr></thead><tbody>${paramRows}</tbody></table></div>
+    <div class="detail-section"><div class="detail-label">Return</div><span class="return-badge">${fn.ret}</span></div>
+    <div class="detail-section"><div class="detail-label">사용 예시</div><div class="code-block">${fn.example}</div></div>
+    <div class="detail-section"><div class="detail-label">함수 전문</div><div class="code-block">${fn.fullcode}</div></div>
+  `;
+}
+
+function openModal(group) {
+  modalIcon.textContent = group.icon;
+  modalTitle.textContent = group.name;
+  modalDesc.textContent = group.desc;
+  fnList.innerHTML = '';
+  group.fns.forEach(fn => fnList.appendChild(buildFnItem(fn)));
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function closeModal() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+// SEARCH
+const searchInput  = document.getElementById('searchInput');
+const ac           = document.getElementById('autocomplete');
+const srPanel      = document.getElementById('search-result');
+const cardsSection = document.getElementById('cards-section');
+let acSelected = -1, acItems = [];
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { ac.classList.remove('open'); showCards(); return; }
+  renderAC(fnIndex.filter(f => f.name.toLowerCase().includes(q) || f.brief.toLowerCase().includes(q)), q);
+});
+
+searchInput.addEventListener('keydown', e => {
+  if (!ac.classList.contains('open')) return;
+  if (e.key === 'ArrowDown') { acSelected = Math.min(acSelected+1, acItems.length-1); highlightAC(); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { acSelected = Math.max(acSelected-1, 0); highlightAC(); e.preventDefault(); }
+  else if (e.key === 'Enter') { if (acSelected>=0 && acItems[acSelected]) selectFn(acItems[acSelected]); e.preventDefault(); }
+  else if (e.key === 'Escape') { ac.classList.remove('open'); }
+});
+
+function renderAC(matches, q) {
+  acItems = matches.slice(0,8); acSelected = -1;
+  if (!acItems.length) { ac.classList.remove('open'); return; }
+  ac.innerHTML = acItems.map((f,i) => {
+    const hi = f.name.replace(new RegExp(`(${q})`,'gi'),'<span class="ac-match">$1</span>');
+    return `<div class="ac-item" data-i="${i}">${hi}() <span class="ac-group">${f.group}</span></div>`;
+  }).join('');
+  ac.classList.add('open');
+  ac.querySelectorAll('.ac-item').forEach((el,i) => el.addEventListener('click', () => selectFn(acItems[i])));
+}
+
+function highlightAC() { ac.querySelectorAll('.ac-item').forEach((el,i) => el.classList.toggle('selected', i===acSelected)); }
+function selectFn(fn) { searchInput.value = fn.name; ac.classList.remove('open'); showSearchResult(fn); }
+function showSearchResult(fn) {
+  cardsSection.classList.add('hidden'); srPanel.classList.add('visible');
+  srPanel.innerHTML = `
+    <button class="back-btn" id="backBtn">← 메인으로</button>
+    <div class="section-label"><h2>검색 결과</h2></div>
+    <div class="sr-card"><div class="sr-header"><div class="sr-fn-sig">${fn.sig}</div><div class="sr-group">${fn.group}</div></div>
+    <div class="sr-body">${buildDetail(fn)}</div></div>`;
+  document.getElementById('backBtn').addEventListener('click', () => {
+    searchInput.value = '';
+    showCards();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  srPanel.scrollIntoView({ behavior: 'smooth' });
+}
+function showCards() { srPanel.classList.remove('visible'); srPanel.innerHTML=''; cardsSection.classList.remove('hidden'); }
+document.addEventListener('click', e => { if (!document.getElementById('searchBox').contains(e.target)) ac.classList.remove('open'); });
+searchInput.addEventListener('keyup', e => { if (e.key==='Escape' || searchInput.value==='') showCards(); });
+
+// 타이틀 클릭 → 메인으로
+document.getElementById('gameTitle').addEventListener('click', () => {
+  searchInput.value = '';
+  showCards();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>
